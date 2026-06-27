@@ -6,7 +6,7 @@ This project is intended as an open-source alternative reporting layer for envir
 
 ## Status
 
-Initial production scaffold, version `0.1.0`. API endpoint coverage is intentionally modular so new Veeam REST resources can be added without turning the collector into one giant script.
+Production collector and Grafana dashboard bundle. API endpoint coverage is intentionally modular so new Veeam REST resources can be added without turning the collector into one giant script.
 
 ## Features
 
@@ -15,7 +15,7 @@ Initial production scaffold, version `0.1.0`. API endpoint coverage is intention
 - InfluxDB v2 line protocol writer
 - JSON configuration with validation
 - Normalized job categories: `Backup`, `Backup Copy`, `Replication`, `Tape`, `SureBackup`, `NAS`, `Agent`, `Other`
-- Collectors for jobs, sessions, task sessions, VM inventory, protection analysis, restore points, repositories, SOBR, backup copy, replication, tape, infrastructure, server summary, license, and version information
+- Collectors for jobs, sessions, task sessions, VM inventory, protection analysis, restore points, repositories, SOBR, backup copy, replication, tape, infrastructure, server summary, and optional Veeam metadata
 - Windows installer, upgrade, and uninstaller scripts
 - Windows Scheduled Task support
 - Grafana dashboard bundle with variables and drill-down links
@@ -109,12 +109,12 @@ pwsh -File .\src\Collector.ps1 -ConfigPath .\config.json
 - `veeam_endpoint_status`
 - `veeam_gateway`
 - `veeam_mount_server`
-- `veeam_version_info`
-- `veeam_license_info`
 
 ## Dashboards
 
-The overview dashboard includes collector summary and endpoint coverage panels. Endpoint coverage uses `veeam_endpoint_status` so Grafana can show whether a missing panel is caused by no matching data, a skipped endpoint, a forbidden endpoint, or a Veeam REST endpoint that is unavailable in the installed Veeam version.
+The overview dashboard includes readable collector summary cards, Veeam API collection health, and a VMs With No Backup table. API collection health uses `veeam_endpoint_status` to show whether a collector step succeeded, was skipped because Veeam denied it, or is unavailable in the installed Veeam version. It is collection health, not backup job health.
+
+The protection dashboard provides VM-level drill-downs for no-backup VMs, stale protection, and all VM protection detail. A VM can only appear as unprotected if Veeam exposes it through inventory, restore points, task sessions, or replication data.
 
 ## Development
 

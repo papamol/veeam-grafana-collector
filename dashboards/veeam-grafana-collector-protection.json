@@ -23,9 +23,10 @@
         "type": "influxdb",
         "uid": "$datasource"
       },
+      "description": "Summary of protection flags. protected=1 means a backup restore point was found. no_backup=1 means this VM is known to the collector but no backup restore point was found. stale_backup/stale_replication indicate stale or missing recent protection.",
       "gridPos": {
-        "h": 8,
-        "w": 8,
+        "h": 5,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -36,7 +37,7 @@
           "refId": "A"
         }
       ],
-      "title": "Protection Status",
+      "title": "Protection Summary",
       "type": "stat"
     },
     {
@@ -44,20 +45,65 @@
         "type": "influxdb",
         "uid": "$datasource"
       },
+      "description": "This is the main list for VMs not being backed up. A VM can only appear here if Veeam exposes it through inventory, restore points, task sessions, or replication jobs.",
       "gridPos": {
-        "h": 8,
-        "w": 16,
-        "x": 8,
-        "y": 0
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "id": 3,
+      "targets": [
+        {
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\" and r._value == 1)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> last()\n  |> keep(columns:[\"_time\", \"vm\", \"protection_status\", \"protection_type\", \"_value\"])\n  |> rename(columns:{_value:\"No backup\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "VMs With No Backup",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "VMs with stale backup or stale replication flags.",
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "id": 4,
+      "targets": [
+        {
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"stale_backup\" or r._field == \"stale_replication\")\n  |> filter(fn: (r) => r._value == 1)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_type\", \"_field\"])\n  |> last()\n  |> keep(columns:[\"_time\", \"vm\", \"protection_type\", \"_field\", \"_value\"])\n  |> rename(columns:{_field:\"Stale flag\", _value:\"Is stale\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "Stale Protection",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "Full VM protection table. Set the VM variable or open the VM dashboard to drill into a specific VM.",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 14
       },
       "id": 2,
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r.vm =~ /^${vm:regex}$/)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r.vm =~ /^${vm:regex}$/)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"protected\", \"no_backup\", \"backup\", \"backup_copy\", \"replication\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\"])",
           "refId": "A"
         }
       ],
-      "title": "VM Protection Detail",
+      "title": "All VM Protection Detail",
       "type": "table"
     }
   ],

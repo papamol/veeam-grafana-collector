@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.2.2] - 2026-06-27
+
+### Changed
+
+- Reworked the overview dashboard summary into large readable stat cards.
+- Renamed endpoint coverage to Veeam API collection health and added a plain-language panel description.
+- Added no-backup VM tables to the overview and protection dashboards.
+- Added a protection drill-down layout with no-backup, stale-protection, and all-VM detail tables.
+
 ## [0.2.1] - 2026-06-27
 
 ### Fixed

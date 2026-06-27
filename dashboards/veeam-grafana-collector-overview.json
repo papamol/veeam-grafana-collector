@@ -23,20 +23,59 @@
         "type": "influxdb",
         "uid": "$datasource"
       },
+      "description": "Latest jobs count written by the collector for the selected customer/site/server.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "textMode": "value_and_name"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
       "gridPos": {
-        "h": 5,
-        "w": 8,
+        "h": 4,
+        "w": 4,
         "x": 0,
         "y": 0
       },
-      "id": 5,
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()",
-          "refId": "A"
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\" and r._field == \"jobs\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
         }
       ],
-      "title": "Collector Summary",
+      "title": "Jobs",
       "type": "stat"
     },
     {
@@ -44,32 +83,321 @@
         "type": "influxdb",
         "uid": "$datasource"
       },
+      "description": "Latest sessions count written by the collector for the selected customer/site/server.",
       "fieldConfig": {
         "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
+            "textMode": "value_and_name"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 16,
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\" and r._field == \"sessions\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+        }
+      ],
+      "title": "Sessions",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "Latest vms seen count written by the collector for the selected customer/site/server.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "textMode": "value_and_name"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
         "x": 8,
         "y": 0
+      },
+      "id": 13,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\" and r._field == \"vms\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+        }
+      ],
+      "title": "VMs Seen",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "Latest repositories count written by the collector for the selected customer/site/server.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "textMode": "value_and_name"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\" and r._field == \"repositories\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+        }
+      ],
+      "title": "Repositories",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "Latest restore points count written by the collector for the selected customer/site/server.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "textMode": "value_and_name"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\" and r._field == \"restore_points\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+        }
+      ],
+      "title": "Restore Points",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "Latest object stores count written by the collector for the selected customer/site/server.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "textMode": "value_and_name"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\" and r._field == \"object_storage_repositories\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+        }
+      ],
+      "title": "Object Stores",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "Shows what each collector step tried against the Veeam REST API. Result=success means the endpoint returned data or an empty valid response. Result=skipped means Veeam returned Forbidden, Not Found, Method Not Allowed, or another error. This is collection health, not backup job health.",
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 4
       },
       "id": 6,
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_endpoint_status\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"collector\", \"endpoint\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"_time\", \"collector\", \"endpoint\", \"status\", \"available\", \"item_count\", \"duration_ms\", \"error\"])",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_endpoint_status\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"collector\", \"endpoint\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"collector\", \"endpoint\", \"status\"])\n  |> pivot(rowKey:[\"collector\", \"endpoint\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"collector\", \"endpoint\", \"status\", \"available\", \"item_count\", \"duration_ms\", \"error\"])\n  |> rename(columns:{collector:\"Collector step\", endpoint:\"Veeam API endpoint\", status:\"Result\", available:\"Available\", item_count:\"Items collected\", duration_ms:\"Duration ms\", error:\"Meaning / Error\"})",
           "refId": "A"
         }
       ],
-      "title": "Endpoint Coverage",
+      "title": "Veeam API Collection Health",
       "type": "table"
     },
     {
@@ -77,11 +405,34 @@
         "type": "influxdb",
         "uid": "$datasource"
       },
+      "description": "VMs known to Veeam-derived collector data where no backup restore point was found. A VM can only appear here if Veeam exposes it through inventory, restore points, task sessions, or replication jobs.",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 5
+        "y": 11
+      },
+      "id": 17,
+      "targets": [
+        {
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\" and r._value == 1)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> last()\n  |> keep(columns:[\"_time\", \"vm\", \"protection_status\", \"protection_type\", \"_value\"])\n  |> rename(columns:{_value:\"No backup\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "VMs With No Backup",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 11
       },
       "id": 1,
       "targets": [
@@ -98,38 +449,12 @@
         "type": "influxdb",
         "uid": "$datasource"
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 5
-      },
-      "id": 2,
-      "targets": [
-        {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_task_session\")\n  |> filter(fn: (r) => r.result == \"Failed\" or r.status == \"Failed\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> pivot(rowKey:[\"_time\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"_time\", \"customer\", \"site\", \"server\", \"job_category\", \"job_name\", \"vm\", \"failure_message\", \"duration_seconds\"])",
-          "refId": "A"
-        }
-      ],
-      "title": "Failed Jobs and VM Tasks",
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "$datasource"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes"
-        },
-        "overrides": []
-      },
+      "description": "Repository free and used bytes for the selected repository.",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 13
+        "y": 19
       },
       "id": 3,
       "targets": [
@@ -146,21 +471,44 @@
         "type": "influxdb",
         "uid": "$datasource"
       },
+      "description": "Protection state for the selected VM variable. Use the Protection dashboard for drill-down tables.",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 13
+        "y": 19
       },
       "id": 4,
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\" or r._field == \"stale_backup\" or r._field == \"stale_replication\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and r.vm =~ /^${vm:regex}$/)\n  |> last()",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\" or r._field == \"no_backup\" or r._field == \"stale_backup\" or r._field == \"stale_replication\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and r.vm =~ /^${vm:regex}$/)\n  |> last()",
           "refId": "A"
         }
       ],
-      "title": "VM Protection",
+      "title": "Selected VM Protection",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "description": "Failed VM task/session rows in the selected time range.",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 2,
+      "targets": [
+        {
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_task_session\")\n  |> filter(fn: (r) => r.result == \"Failed\" or r.status == \"Failed\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> pivot(rowKey:[\"_time\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"_time\", \"customer\", \"site\", \"server\", \"job_category\", \"job_name\", \"vm\", \"failure_message\", \"duration_seconds\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Failed Jobs and VM Tasks",
+      "type": "table"
     }
   ],
   "refresh": "5m",
