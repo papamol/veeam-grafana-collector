@@ -23,7 +23,9 @@ jobs:
 
       - name: Lint PowerShell
         shell: pwsh
-        run: Invoke-ScriptAnalyzer -Path ./src,./installer -Recurse -Severity Warning,Error
+        run: |
+          Invoke-ScriptAnalyzer -Path ./src -Recurse -Severity Warning,Error
+          Invoke-ScriptAnalyzer -Path ./installer -Recurse -Severity Warning,Error
 
       - name: Run tests
         shell: pwsh
