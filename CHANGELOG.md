@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.7] - 2026-06-27
+
+### Fixed
+
+- Paged Veeam REST collection calls to avoid unbounded endpoint requests timing out.
+
 ## [0.1.6] - 2026-06-27
 
 ### Fixed

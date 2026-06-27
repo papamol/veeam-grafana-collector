@@ -121,17 +121,39 @@ function Get-VeeamCollection {
         [psobject]$Session,
 
         [Parameter(Mandatory)]
-        [string]$Path
+        [string]$Path,
+
+        [int]$Limit = 100
     )
 
-    $response = Invoke-VeeamApi -Session $Session -Path $Path
-    foreach ($propertyName in @('data', 'items', 'results')) {
-        if ($response.PSObject.Properties[$propertyName]) {
-            return @($response.$propertyName)
-        }
-    }
+    $results = [System.Collections.Generic.List[object]]::new()
+    $offset = 0
 
-    return @($response)
+    do {
+        $separator = if ($Path.Contains('?')) { '&' } else { '?' }
+        $pagedPath = '{0}{1}limit={2}&offset={3}' -f $Path, $separator, $Limit, $offset
+        $response = Invoke-VeeamApi -Session $Session -Path $pagedPath
+        $items = $null
+
+        foreach ($propertyName in @('data', 'items', 'results')) {
+            if ($response.PSObject.Properties[$propertyName]) {
+                $items = @($response.$propertyName)
+                break
+            }
+        }
+
+        if ($null -eq $items) {
+            $items = @($response)
+        }
+
+        foreach ($item in $items) {
+            $results.Add($item)
+        }
+
+        $offset += $items.Count
+    } while ($items.Count -eq $Limit)
+
+    return $results.ToArray()
 }
 
 if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Connect-VeeamApi, Invoke-VeeamApi, Get-VeeamCollection, Set-CollectorCertificatePolicy }
