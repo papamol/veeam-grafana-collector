@@ -176,6 +176,13 @@ try {
     $serverInfo = Invoke-CollectorStep -Name 'server version' -Endpoint '/v1/serverInfo' -ScriptBlock { Get-VeeamServerInfo -Session $session }
     $licenseInfo = Invoke-CollectorStep -Name 'license' -Endpoint '/v1/license' -ScriptBlock { Get-VeeamLicenseInfo -Session $session }
 
+    if ($vms.Count -eq 0) {
+        $vms = @(New-VeeamVMInventoryFromCollectedData -RestorePoints $restorePoints -TaskSessions $taskSessions -ReplicationJobs $replicas)
+        if ($vms.Count -gt 0) {
+            Write-CollectorLog -Message ("Derived VM inventory from collected Veeam restore point, task session, and replication data: {0}" -f $vms.Count)
+        }
+    }
+
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-JobMetrics -Jobs $jobs -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-JobCategorySummaryMetrics -Jobs $jobs -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-SessionMetrics -Sessions $sessions -Config $config)

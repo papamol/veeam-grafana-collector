@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.2.1] - 2026-06-27
+
+### Fixed
+
+- Derived `veeam_vm_inventory` from Veeam restore point, task session, and replication data when REST inventory endpoints are blocked or unavailable.
+- Stopped retrying non-retryable Veeam REST `403`, `404`, and `405` endpoint failures to reduce slow optional endpoint probes.
+
 ## [0.2.0] - 2026-06-27
 
 ### Added

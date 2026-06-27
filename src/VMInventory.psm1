@@ -40,4 +40,49 @@ function ConvertTo-VMInventoryMetrics {
     }
 }
 
-if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Get-VeeamVMInventory, ConvertTo-VMInventoryMetrics }
+function New-VeeamVMInventoryFromCollectedData {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$RestorePoints,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$TaskSessions,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ReplicationJobs
+    )
+
+    $vmNames = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+
+    foreach ($point in $RestorePoints) {
+        $vmName = Get-PropertyValue -InputObject $point -Names @('vmName', 'name')
+        if (-not [string]::IsNullOrWhiteSpace($vmName)) {
+            $null = $vmNames.Add($vmName)
+        }
+    }
+
+    foreach ($task in $TaskSessions) {
+        $vmName = Get-PropertyValue -InputObject $task -Names @('vmName', 'name')
+        if (-not [string]::IsNullOrWhiteSpace($vmName)) {
+            $null = $vmNames.Add($vmName)
+        }
+    }
+
+    foreach ($replica in $ReplicationJobs) {
+        $vmName = Get-PropertyValue -InputObject $replica -Names @('vmName', 'name')
+        if (-not [string]::IsNullOrWhiteSpace($vmName)) {
+            $null = $vmNames.Add($vmName)
+        }
+    }
+
+    foreach ($vmName in $vmNames) {
+        [pscustomobject]@{
+            name = $vmName
+            platform = 'unknown'
+            clusterName = ''
+            hostName = ''
+            folder = ''
+            datastore = ''
+            powerState = 'unknown'
+            inventorySource = 'collector-derived'
+        }
+    }
+}
+
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Get-VeeamVMInventory, New-VeeamVMInventoryFromCollectedData, ConvertTo-VMInventoryMetrics }

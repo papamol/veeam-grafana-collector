@@ -114,10 +114,35 @@ function Invoke-WithRetry {
                 throw
             }
 
+            if (-not (Test-RetryableError -ErrorRecord $_)) {
+                throw
+            }
+
             $delay = [Math]::Min(60, $InitialDelaySeconds * [Math]::Pow(2, ($attempt - 1)))
             Start-Sleep -Seconds $delay
         }
     } while ($attempt -lt $MaxAttempts)
+}
+
+function Test-RetryableError {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [System.Management.Automation.ErrorRecord]$ErrorRecord
+    )
+
+    $message = $ErrorRecord.Exception.Message
+    if ($message -match 'status code does not indicate success:\s*(\d{3})') {
+        $statusCode = [int]$Matches[1]
+        return $statusCode -eq 408 -or $statusCode -eq 429 -or $statusCode -ge 500
+    }
+
+    if ($ErrorRecord.Exception.Response -and $ErrorRecord.Exception.Response.StatusCode) {
+        $statusCode = [int]$ErrorRecord.Exception.Response.StatusCode
+        return $statusCode -eq 408 -or $statusCode -eq 429 -or $statusCode -ge 500
+    }
+
+    return $true
 }
 
 function Get-PropertyValue {
@@ -170,4 +195,4 @@ function Get-JobCategory {
     }
 }
 
-if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Read-CollectorConfig, Test-CollectorConfig, ConvertTo-SafeTagValue, ConvertTo-InfluxFieldValue, Invoke-WithRetry, Get-PropertyValue, Get-JobCategory }
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Read-CollectorConfig, Test-CollectorConfig, ConvertTo-SafeTagValue, ConvertTo-InfluxFieldValue, Invoke-WithRetry, Test-RetryableError, Get-PropertyValue, Get-JobCategory }

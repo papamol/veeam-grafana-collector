@@ -72,3 +72,27 @@ Describe 'Test-CollectorConfig' {
         Test-CollectorConfig -Config $config | Should -BeTrue
     }
 }
+
+Describe 'Invoke-WithRetry' {
+    It 'does not retry non-retryable 404 REST failures' {
+        $script:attempts = 0
+
+        { Invoke-WithRetry -MaxAttempts 3 -InitialDelaySeconds 1 -ScriptBlock {
+            $script:attempts++
+            throw 'Response status code does not indicate success: 404 (Not Found).'
+        } } | Should -Throw
+
+        $script:attempts | Should -Be 1
+    }
+
+    It 'retries retryable 500 REST failures' {
+        $script:attempts = 0
+
+        { Invoke-WithRetry -MaxAttempts 2 -InitialDelaySeconds 0 -ScriptBlock {
+            $script:attempts++
+            throw 'Response status code does not indicate success: 500 (Internal Server Error).'
+        } } | Should -Throw
+
+        $script:attempts | Should -Be 2
+    }
+}
