@@ -125,7 +125,7 @@ function Get-VeeamCollection {
 
         [int]$Limit = 1,
 
-        [int]$MaxPages = 500
+        [int]$MaxPages = 1
     )
 
     $results = [System.Collections.Generic.List[object]]::new()
@@ -186,7 +186,11 @@ function Get-VeeamCollection {
         }
 
         $offset += $items.Count
-    } while ($items.Count -eq $Limit -and ($null -eq $total -or $offset -lt $total))
+    } while ($page -lt $MaxPages -and $items.Count -eq $Limit -and ($null -eq $total -or $offset -lt $total))
+
+    if ($null -ne $total -and $results.Count -lt $total -and (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue)) {
+        Write-CollectorLog -Message ("Collected {0} of {1} available item(s) from {2}; additional pages are disabled to avoid slow Veeam pagination." -f $results.Count, $total, $Path) -Level WARN
+    }
 
     return $results.ToArray()
 }

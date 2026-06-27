@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.12] - 2026-06-27
+
+### Fixed
+
+- Limited Veeam REST collection to the first safe page by default to avoid servers that hang on subsequent pages.
+
 ## [0.1.11] - 2026-06-27
 
 ### Fixed

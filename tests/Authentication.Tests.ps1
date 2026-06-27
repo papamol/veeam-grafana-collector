@@ -34,7 +34,7 @@ Describe 'Get-VeeamCollection' {
             TimeoutSec = 120
         }
 
-        $result = Get-VeeamCollection -Session $session -Path '/v1/jobs?type=Replication' -Limit 2
+        $result = Get-VeeamCollection -Session $session -Path '/v1/jobs?type=Replication' -Limit 2 -MaxPages 2
 
         $result.Count | Should -Be 3
         $requestedUris[0] | Should -Be 'https://localhost:9419/api/v1/jobs?type=Replication&limit=2&skip=0'
