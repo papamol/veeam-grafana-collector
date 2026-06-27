@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.11] - 2026-06-27
+
+### Fixed
+
+- Reduced Veeam REST timeouts for collection requests.
+- Allowed the collector to skip slow or unsupported Veeam endpoints instead of blocking the whole run.
+- Returned partial paged results when a later Veeam page times out.
+
 ## [0.1.10] - 2026-06-27
 
 ### Fixed

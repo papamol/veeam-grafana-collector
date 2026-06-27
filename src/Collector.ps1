@@ -67,7 +67,13 @@ function Invoke-CollectorStep {
     )
 
     Write-CollectorLog -Message "Collecting $Name..."
-    $result = & $ScriptBlock
+    try {
+        $result = & $ScriptBlock
+    }
+    catch {
+        Write-CollectorLog -Message ("Skipping {0}: {1}" -f $Name, $_.Exception.Message) -Level WARN
+        return @()
+    }
     $count = if ($null -eq $result) {
         0
     }

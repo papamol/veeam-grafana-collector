@@ -44,7 +44,7 @@ function Connect-VeeamApi {
         }
         Body = $body
         ContentType = 'application/x-www-form-urlencoded'
-        TimeoutSec = 120
+        TimeoutSec = 30
     }
     if ($ignoreCertificateErrors) {
         $request.SkipCertificateCheck = $true
@@ -67,7 +67,7 @@ function Connect-VeeamApi {
             'x-api-version' = $apiVersion
         }
         SkipCertificateCheck = $ignoreCertificateErrors
-        TimeoutSec = 120
+        TimeoutSec = 30
     }
 }
 
@@ -143,7 +143,19 @@ function Get-VeeamCollection {
         if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
             Write-CollectorLog -Message ("Requesting {0} page {1}" -f $pagedPath, $page)
         }
-        $response = Invoke-VeeamApi -Session $Session -Path $pagedPath
+        try {
+            $response = Invoke-VeeamApi -Session $Session -Path $pagedPath
+        }
+        catch {
+            if ($results.Count -gt 0) {
+                if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+                    Write-CollectorLog -Message ("Stopping paged collection for {0} after {1} item(s): {2}" -f $Path, $results.Count, $_.Exception.Message) -Level WARN
+                }
+                break
+            }
+
+            throw
+        }
         $items = $null
 
         foreach ($propertyName in @('data', 'items', 'results')) {
