@@ -20,7 +20,8 @@ function Connect-VeeamApi {
         [psobject]$Config
     )
 
-    Set-CollectorCertificatePolicy -IgnoreCertificateErrors ([bool]$Config.Veeam.IgnoreCertificateErrors)
+    $ignoreCertificateErrors = [bool]$Config.Veeam.IgnoreCertificateErrors
+    Set-CollectorCertificatePolicy -IgnoreCertificateErrors $ignoreCertificateErrors
 
     $body = @{
         username = $Config.Veeam.Username
@@ -28,8 +29,18 @@ function Connect-VeeamApi {
     }
 
     $uri = '{0}/oauth2/token' -f $Config.Veeam.BaseUrl.TrimEnd('/')
+    $request = @{
+        Method = 'Post'
+        Uri = $uri
+        Body = $body
+        ContentType = 'application/x-www-form-urlencoded'
+    }
+    if ($ignoreCertificateErrors) {
+        $request.SkipCertificateCheck = $true
+    }
+
     $response = Invoke-WithRetry -ScriptBlock {
-        Invoke-RestMethod -Method Post -Uri $uri -Body $body -ContentType 'application/x-www-form-urlencoded'
+        Invoke-RestMethod @request
     }
 
     $token = Get-PropertyValue -InputObject $response -Names @('access_token', 'accessToken', 'token')
@@ -43,6 +54,7 @@ function Connect-VeeamApi {
             Authorization = "Bearer $token"
             Accept = 'application/json'
         }
+        SkipCertificateCheck = $ignoreCertificateErrors
     }
 }
 
@@ -64,12 +76,21 @@ function Invoke-VeeamApi {
 
     $uri = if ($Path.StartsWith('http')) { $Path } else { '{0}/{1}' -f $Session.BaseUrl.TrimEnd('/'), $Path.TrimStart('/') }
 
+    $request = @{
+        Method = $Method
+        Uri = $uri
+        Headers = $Session.Headers
+    }
+    if ([bool]$Session.SkipCertificateCheck) {
+        $request.SkipCertificateCheck = $true
+    }
+
     Invoke-WithRetry -ScriptBlock {
         if ($null -eq $Body) {
-            Invoke-RestMethod -Method $Method -Uri $uri -Headers $Session.Headers
+            Invoke-RestMethod @request
         }
         else {
-            Invoke-RestMethod -Method $Method -Uri $uri -Headers $Session.Headers -Body ($Body | ConvertTo-Json -Depth 20) -ContentType 'application/json'
+            Invoke-RestMethod @request -Body ($Body | ConvertTo-Json -Depth 20) -ContentType 'application/json'
         }
     }
 }

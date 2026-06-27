@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.4] - 2026-06-27
+
+### Fixed
+
+- Honored `Veeam.IgnoreCertificateErrors` with PowerShell 7 REST calls.
+
 ## [0.1.3] - 2026-06-27
 
 ### Fixed
