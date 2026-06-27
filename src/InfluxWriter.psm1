@@ -14,7 +14,8 @@ function ConvertTo-InfluxLine {
         [Parameter(Mandatory)]
         [hashtable]$Fields,
 
-        [datetime]$Timestamp = (Get-Date).ToUniversalTime()
+        [AllowNull()]
+        [object]$Timestamp = $null
     )
 
     $tagText = ($Tags.GetEnumerator() | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.Value) } | Sort-Object Name | ForEach-Object {
@@ -29,11 +30,20 @@ function ConvertTo-InfluxLine {
         throw "Measurement '$Measurement' has no fields."
     }
 
-    $ns = [int64](($Timestamp.ToUniversalTime() - [datetime]'1970-01-01T00:00:00Z').TotalMilliseconds * 1000000)
     if ([string]::IsNullOrWhiteSpace($tagText)) {
+        if ($null -eq $Timestamp) {
+            return '{0} {1}' -f (ConvertTo-SafeTagValue $Measurement), $fieldText
+        }
+
+        $ns = [int64]((([datetime]$Timestamp).ToUniversalTime() - [datetime]'1970-01-01T00:00:00Z').TotalMilliseconds * 1000000)
         return '{0} {1} {2}' -f (ConvertTo-SafeTagValue $Measurement), $fieldText, $ns
     }
 
+    if ($null -eq $Timestamp) {
+        return '{0},{1} {2}' -f (ConvertTo-SafeTagValue $Measurement), $tagText, $fieldText
+    }
+
+    $ns = [int64]((([datetime]$Timestamp).ToUniversalTime() - [datetime]'1970-01-01T00:00:00Z').TotalMilliseconds * 1000000)
     return '{0},{1} {2} {3}' -f (ConvertTo-SafeTagValue $Measurement), $tagText, $fieldText, $ns
 }
 

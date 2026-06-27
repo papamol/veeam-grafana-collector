@@ -9,5 +9,11 @@ Describe 'ConvertTo-InfluxLine' {
         $line | Should -Match 'enabled=true'
         $line | Should -Match 'count=2i'
         $line | Should -Match 'message="ok"'
+        $line | Should -Match ' \d+$'
+    }
+
+    It 'omits timestamp by default so InfluxDB can assign receive time' {
+        $line = ConvertTo-InfluxLine -Measurement 'veeam_job_info' -Tags @{ job_name = 'Backup Job' } -Fields @{ enabled = $true }
+        $line | Should -Be 'veeam_job_info,job_name=Backup\ Job enabled=true'
     }
 }

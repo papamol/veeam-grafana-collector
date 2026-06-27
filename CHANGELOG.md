@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.16] - 2026-06-27
+
+### Fixed
+
+- Let InfluxDB assign write timestamps by default to avoid future-dated points from local time conversion.
+
 ## [0.1.15] - 2026-06-27
 
 ### Fixed
