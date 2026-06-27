@@ -16,7 +16,7 @@ This project follows Semantic Versioning.
 - Added VM inventory, object storage, server info, and license endpoint fallback support for Veeam REST version differences.
 - Added a complete dashboard suite for executive, backup, replication, tape, infrastructure, repository, protection, VM, and failed-job views.
 - Added richer VM protection classification for backup, backup copy, replication, both backup and replication, no backup, and stale protection states.
-- Added PSScriptAnalyzer settings and WiX bootstrap in CI/CD release workflows.
+- Added PSScriptAnalyzer settings and pinned WiX bootstrap in CI/CD release workflows.
 
 ### Changed
 
