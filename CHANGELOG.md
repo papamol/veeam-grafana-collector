@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.6] - 2026-06-27
+
+### Fixed
+
+- Added the Veeam API version header to REST calls.
+- Added Veeam REST request timeouts and endpoint-specific error context.
+- Added collector progress logging for each Veeam collection stage.
+
 ## [0.1.5] - 2026-06-27
 
 ### Fixed

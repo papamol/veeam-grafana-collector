@@ -21,6 +21,12 @@ function Connect-VeeamApi {
     )
 
     $ignoreCertificateErrors = [bool]$Config.Veeam.IgnoreCertificateErrors
+    $apiVersion = if ($Config.Veeam.PSObject.Properties['ApiVersion'] -and -not [string]::IsNullOrWhiteSpace($Config.Veeam.ApiVersion)) {
+        $Config.Veeam.ApiVersion
+    }
+    else {
+        '1.3-rev1'
+    }
     Set-CollectorCertificatePolicy -IgnoreCertificateErrors $ignoreCertificateErrors
 
     $body = @{
@@ -33,8 +39,12 @@ function Connect-VeeamApi {
     $request = @{
         Method = 'Post'
         Uri = $uri
+        Headers = @{
+            'x-api-version' = $apiVersion
+        }
         Body = $body
         ContentType = 'application/x-www-form-urlencoded'
+        TimeoutSec = 120
     }
     if ($ignoreCertificateErrors) {
         $request.SkipCertificateCheck = $true
@@ -54,8 +64,10 @@ function Connect-VeeamApi {
         Headers = @{
             Authorization = "Bearer $token"
             Accept = 'application/json'
+            'x-api-version' = $apiVersion
         }
         SkipCertificateCheck = $ignoreCertificateErrors
+        TimeoutSec = 120
     }
 }
 
@@ -81,17 +93,23 @@ function Invoke-VeeamApi {
         Method = $Method
         Uri = $uri
         Headers = $Session.Headers
+        TimeoutSec = $Session.TimeoutSec
     }
     if ([bool]$Session.SkipCertificateCheck) {
         $request.SkipCertificateCheck = $true
     }
 
     Invoke-WithRetry -ScriptBlock {
-        if ($null -eq $Body) {
-            Invoke-RestMethod @request
+        try {
+            if ($null -eq $Body) {
+                Invoke-RestMethod @request
+            }
+            else {
+                Invoke-RestMethod @request -Body ($Body | ConvertTo-Json -Depth 20) -ContentType 'application/json'
+            }
         }
-        else {
-            Invoke-RestMethod @request -Body ($Body | ConvertTo-Json -Depth 20) -ContentType 'application/json'
+        catch {
+            throw "Veeam API request failed for $uri. $($_.Exception.Message)"
         }
     }
 }

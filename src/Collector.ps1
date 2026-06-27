@@ -60,24 +60,46 @@ function Add-MetricLines {
     }
 }
 
+function Invoke-CollectorStep {
+    param(
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][scriptblock]$ScriptBlock
+    )
+
+    Write-CollectorLog -Message "Collecting $Name..."
+    $result = & $ScriptBlock
+    $count = if ($null -eq $result) {
+        0
+    }
+    elseif ($result -is [System.Collections.ICollection]) {
+        $result.Count
+    }
+    else {
+        1
+    }
+    Write-CollectorLog -Message ("Collected {0}: {1}" -f $Name, $count)
+    return $result
+}
+
 Initialize-Logger -LogPath $LogPath
 Write-CollectorLog -Message 'Collector started.'
 
 try {
     $config = Read-CollectorConfig -Path $ConfigPath
     $session = Connect-VeeamApi -Config $config
+    Write-CollectorLog -Message 'Authenticated to Veeam REST API.'
     $lines = [System.Collections.Generic.List[string]]::new()
 
-    $jobs = @(Get-VeeamJobs -Session $session)
-    $sessions = @(Get-VeeamSessions -Session $session)
-    $taskSessions = @(Get-VeeamTaskSessions -Session $session)
-    $vms = @(Get-VeeamVMInventory -Session $session)
-    $restorePoints = @(Get-VeeamRestorePoints -Session $session)
-    $repositories = @(Get-VeeamRepositories -Session $session)
-    $sobr = @(Get-VeeamSOBR -Session $session)
-    $replicas = @(Get-VeeamReplicationJobs -Session $session)
-    $tape = @(Get-VeeamTapeResources -Session $session)
-    $infrastructure = Get-VeeamInfrastructure -Session $session
+    $jobs = @(Invoke-CollectorStep -Name 'jobs' -ScriptBlock { Get-VeeamJobs -Session $session })
+    $sessions = @(Invoke-CollectorStep -Name 'sessions' -ScriptBlock { Get-VeeamSessions -Session $session })
+    $taskSessions = @(Invoke-CollectorStep -Name 'task sessions' -ScriptBlock { Get-VeeamTaskSessions -Session $session })
+    $vms = @(Invoke-CollectorStep -Name 'VM inventory' -ScriptBlock { Get-VeeamVMInventory -Session $session })
+    $restorePoints = @(Invoke-CollectorStep -Name 'restore points' -ScriptBlock { Get-VeeamRestorePoints -Session $session })
+    $repositories = @(Invoke-CollectorStep -Name 'repositories' -ScriptBlock { Get-VeeamRepositories -Session $session })
+    $sobr = @(Invoke-CollectorStep -Name 'scale-out repositories' -ScriptBlock { Get-VeeamSOBR -Session $session })
+    $replicas = @(Invoke-CollectorStep -Name 'replication jobs' -ScriptBlock { Get-VeeamReplicationJobs -Session $session })
+    $tape = @(Invoke-CollectorStep -Name 'tape resources' -ScriptBlock { Get-VeeamTapeResources -Session $session })
+    $infrastructure = Invoke-CollectorStep -Name 'infrastructure' -ScriptBlock { Get-VeeamInfrastructure -Session $session }
 
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-JobMetrics -Jobs $jobs -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-JobCategorySummaryMetrics -Jobs $jobs -Config $config)
@@ -106,6 +128,7 @@ try {
     }
     $lines.Add((ConvertTo-InfluxLine -Measurement 'veeam_server_summary' -Tags $summaryTags -Fields $summaryFields))
 
+    Write-CollectorLog -Message ("Writing {0} metric lines to InfluxDB..." -f $lines.Count)
     Write-InfluxMetrics -Config $config -Lines $lines.ToArray()
     Write-CollectorLog -Message ("Collector completed. Wrote {0} metric lines." -f $lines.Count)
 }
