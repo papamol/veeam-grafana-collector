@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-test-package:
+    name: Lint, test, and package
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install modules
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+          Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
+
+      - name: Lint PowerShell
+        shell: pwsh
+        run: Invoke-ScriptAnalyzer -Path ./src,./installer -Recurse -Severity Warning,Error
+
+      - name: Run tests
+        shell: pwsh
+        run: Invoke-Pester ./tests -CI
+
+      - name: Build release ZIP
+        shell: pwsh
+        run: ./packaging/Build-Release.ps1 -Version 0.1.0
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: veeam-grafana-collector
+          path: artifacts/*.zip
