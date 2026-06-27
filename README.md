@@ -61,7 +61,17 @@ The installer creates `config.json`.
     "BaseUrl": "https://localhost:9419/api",
     "Username": "DOMAIN\\svc-veeam-api",
     "Password": "replace-me",
-    "IgnoreCertificateErrors": false
+    "IgnoreCertificateErrors": false,
+    "ApiVersion": "1.3-rev1"
+  },
+  "Collection": {
+    "PageSize": 1,
+    "MaxPages": 1,
+    "RequestTimeoutSeconds": 30,
+    "EndpointMaxPages": {
+      "/v1/sessions": 10,
+      "/v1/taskSessions": 10
+    }
   },
   "Influx": {
     "Url": "https://influx.example.com",
@@ -71,6 +81,8 @@ The installer creates `config.json`.
   }
 }
 ```
+
+`Collection` is optional. Defaults are conservative because some Veeam REST endpoints can be slow or hang when deeply paged. Increase `PageSize`, `MaxPages`, or `EndpointMaxPages` after validating endpoint behavior in your environment.
 
 ## Run Manually
 

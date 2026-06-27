@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.2.0] - Unreleased
+
+### Added
+
+- Added the `v0.2.0` implementation checklist from the original project requirements.
+- Added optional `Collection` configuration for page size, max pages, request timeout, and per-endpoint max page overrides.
+
 ## [0.1.16] - 2026-06-27
 
 ### Fixed

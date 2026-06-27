@@ -13,6 +13,58 @@ function Set-CollectorCertificatePolicy {
     }
 }
 
+function Get-OptionalIntConfigValue {
+    [CmdletBinding()]
+    param(
+        [AllowNull()][object]$InputObject,
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][int]$DefaultValue,
+        [int]$Minimum = 1
+    )
+
+    if ($null -eq $InputObject -or -not $InputObject.PSObject.Properties[$Name] -or $null -eq $InputObject.$Name) {
+        return $DefaultValue
+    }
+
+    $value = [int]$InputObject.$Name
+    if ($value -lt $Minimum) {
+        return $DefaultValue
+    }
+
+    return $value
+}
+
+function ConvertTo-StringIntHashtable {
+    [CmdletBinding()]
+    param([AllowNull()][object]$InputObject)
+
+    $result = @{}
+    if ($null -eq $InputObject) {
+        return $result
+    }
+
+    foreach ($property in $InputObject.PSObject.Properties) {
+        if ($null -ne $property.Value) {
+            $result[$property.Name] = [int]$property.Value
+        }
+    }
+
+    return $result
+}
+
+function Get-CollectionConfig {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][psobject]$Config)
+
+    $collection = if ($Config.PSObject.Properties['Collection']) { $Config.Collection } else { $null }
+    [pscustomobject]@{
+        PageSize = Get-OptionalIntConfigValue -InputObject $collection -Name 'PageSize' -DefaultValue 1
+        MaxPages = Get-OptionalIntConfigValue -InputObject $collection -Name 'MaxPages' -DefaultValue 1
+        RequestTimeoutSeconds = Get-OptionalIntConfigValue -InputObject $collection -Name 'RequestTimeoutSeconds' -DefaultValue 30
+        EndpointMaxPages = ConvertTo-StringIntHashtable -InputObject $(if ($null -ne $collection -and $collection.PSObject.Properties['EndpointMaxPages']) { $collection.EndpointMaxPages } else { $null })
+    }
+}
+
 function Connect-VeeamApi {
     [CmdletBinding()]
     param(
@@ -21,6 +73,7 @@ function Connect-VeeamApi {
     )
 
     $ignoreCertificateErrors = [bool]$Config.Veeam.IgnoreCertificateErrors
+    $collectionConfig = Get-CollectionConfig -Config $Config
     $apiVersion = if ($Config.Veeam.PSObject.Properties['ApiVersion'] -and -not [string]::IsNullOrWhiteSpace($Config.Veeam.ApiVersion)) {
         $Config.Veeam.ApiVersion
     }
@@ -44,7 +97,7 @@ function Connect-VeeamApi {
         }
         Body = $body
         ContentType = 'application/x-www-form-urlencoded'
-        TimeoutSec = 30
+        TimeoutSec = $collectionConfig.RequestTimeoutSeconds
     }
     if ($ignoreCertificateErrors) {
         $request.SkipCertificateCheck = $true
@@ -67,7 +120,8 @@ function Connect-VeeamApi {
             'x-api-version' = $apiVersion
         }
         SkipCertificateCheck = $ignoreCertificateErrors
-        TimeoutSec = 30
+        TimeoutSec = $collectionConfig.RequestTimeoutSeconds
+        Collection = $collectionConfig
     }
 }
 
@@ -123,10 +177,21 @@ function Get-VeeamCollection {
         [Parameter(Mandatory)]
         [string]$Path,
 
-        [int]$Limit = 1,
+        [int]$Limit = 0,
 
-        [int]$MaxPages = 1
+        [int]$MaxPages = 0
     )
+
+    $collection = if ($Session.PSObject.Properties['Collection']) { $Session.Collection } else { $null }
+    if ($Limit -lt 1) {
+        $Limit = if ($null -ne $collection -and $collection.PSObject.Properties['PageSize']) { [int]$collection.PageSize } else { 1 }
+    }
+    if ($MaxPages -lt 1) {
+        $MaxPages = if ($null -ne $collection -and $collection.PSObject.Properties['MaxPages']) { [int]$collection.MaxPages } else { 1 }
+    }
+    if ($null -ne $collection -and $collection.PSObject.Properties['EndpointMaxPages'] -and $collection.EndpointMaxPages.ContainsKey($Path)) {
+        $MaxPages = [int]$collection.EndpointMaxPages[$Path]
+    }
 
     $results = [System.Collections.Generic.List[object]]::new()
     $offset = 0
