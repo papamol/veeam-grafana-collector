@@ -11,7 +11,7 @@ function Get-VeeamSOBR {
 
 function ConvertTo-SOBRMetrics {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][object[]]$Repositories, [Parameter(Mandatory)][psobject]$Config)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Repositories, [Parameter(Mandatory)][psobject]$Config)
     foreach ($repo in $Repositories) {
         [pscustomobject]@{
             Measurement = 'veeam_sobr'

@@ -11,7 +11,7 @@ function Get-VeeamVMInventory {
 
 function ConvertTo-VMInventoryMetrics {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][object[]]$VMs, [Parameter(Mandatory)][psobject]$Config)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$VMs, [Parameter(Mandatory)][psobject]$Config)
     foreach ($vm in $VMs) {
         [pscustomobject]@{
             Measurement = 'veeam_vm_inventory'

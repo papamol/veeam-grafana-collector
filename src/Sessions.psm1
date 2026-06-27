@@ -11,7 +11,7 @@ function Get-VeeamSessions {
 
 function ConvertTo-SessionMetrics {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][object[]]$Sessions, [Parameter(Mandatory)][psobject]$Config)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Sessions, [Parameter(Mandatory)][psobject]$Config)
     foreach ($session in $Sessions) {
         $jobName = Get-PropertyValue -InputObject $session -Names @('jobName', 'name') -Default 'unknown'
         $jobType = Get-PropertyValue -InputObject $session -Names @('jobType', 'type') -Default 'unknown'

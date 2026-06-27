@@ -5,8 +5,8 @@ Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 function ConvertTo-ProtectionMetrics {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)][object[]]$VMs,
-        [Parameter(Mandatory)][object[]]$RestorePoints,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$VMs,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$RestorePoints,
         [Parameter(Mandatory)][psobject]$Config,
         [int]$StaleBackupHours = 48,
         [int]$StaleReplicationHours = 24

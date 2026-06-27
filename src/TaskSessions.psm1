@@ -11,7 +11,7 @@ function Get-VeeamTaskSessions {
 
 function ConvertTo-TaskSessionMetrics {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][object[]]$TaskSessions, [Parameter(Mandatory)][psobject]$Config)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$TaskSessions, [Parameter(Mandatory)][psobject]$Config)
     foreach ($task in $TaskSessions) {
         $jobName = Get-PropertyValue -InputObject $task -Names @('jobName') -Default 'unknown'
         $jobType = Get-PropertyValue -InputObject $task -Names @('jobType') -Default 'unknown'

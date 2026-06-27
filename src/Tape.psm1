@@ -11,7 +11,7 @@ function Get-VeeamTapeResources {
 
 function ConvertTo-TapeMetrics {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][object[]]$TapeResources, [Parameter(Mandatory)][psobject]$Config)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$TapeResources, [Parameter(Mandatory)][psobject]$Config)
     foreach ($tape in $TapeResources) {
         [pscustomobject]@{
             Measurement = 'veeam_tape'

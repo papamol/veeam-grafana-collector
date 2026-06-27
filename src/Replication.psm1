@@ -11,7 +11,7 @@ function Get-VeeamReplicationJobs {
 
 function ConvertTo-ReplicationMetrics {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][object[]]$Replicas, [Parameter(Mandatory)][psobject]$Config)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Replicas, [Parameter(Mandatory)][psobject]$Config)
     foreach ($replica in $Replicas) {
         [pscustomobject]@{
             Measurement = 'veeam_replication'

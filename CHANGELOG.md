@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.14] - 2026-06-27
+
+### Fixed
+
+- Allowed metric converters to accept empty collections after skipped Veeam endpoints.
+
 ## [0.1.13] - 2026-06-27
 
 ### Fixed

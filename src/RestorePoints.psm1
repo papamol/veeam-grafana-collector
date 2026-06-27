@@ -11,7 +11,7 @@ function Get-VeeamRestorePoints {
 
 function ConvertTo-RestorePointMetrics {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][object[]]$RestorePoints, [Parameter(Mandatory)][psobject]$Config)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$RestorePoints, [Parameter(Mandatory)][psobject]$Config)
     $RestorePoints | Group-Object { Get-PropertyValue -InputObject $_ -Names @('vmName', 'name') -Default 'unknown' } | ForEach-Object {
         $latest = $_.Group | ForEach-Object { Get-PropertyValue -InputObject $_ -Names @('creationTime', 'time') } | Where-Object { $_ } | Sort-Object -Descending | Select-Object -First 1
         $ageHours = if ($latest) { [int]((Get-Date).ToUniversalTime() - ([datetime]$latest).ToUniversalTime()).TotalHours } else { -1 }
