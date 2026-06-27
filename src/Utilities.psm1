@@ -12,7 +12,7 @@ function Read-CollectorConfig {
     }
 
     $config = Get-Content -Path $Path -Raw | ConvertFrom-Json
-    Test-CollectorConfig -Config $config
+    $null = Test-CollectorConfig -Config $config
     return $config
 }
 
