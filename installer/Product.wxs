@@ -16,7 +16,7 @@
   <Fragment>
     <ComponentGroup Id="CollectorFiles" Directory="INSTALLFOLDER">
       <Component>
-        <File Source="..\README.md" />
+        <File Source="README.md" />
       </Component>
     </ComponentGroup>
   </Fragment>
