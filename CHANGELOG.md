@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.1] - 2026-06-26
+
+### Fixed
+
+- Fixed GitHub Actions ScriptAnalyzer invocation so CI passes on Windows runners.
+
 ## [0.1.0] - 2026-06-26
 
 ### Added
