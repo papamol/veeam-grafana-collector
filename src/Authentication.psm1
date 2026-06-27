@@ -260,4 +260,64 @@ function Get-VeeamCollection {
     return $results.ToArray()
 }
 
-if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Connect-VeeamApi, Invoke-VeeamApi, Get-VeeamCollection, Set-CollectorCertificatePolicy }
+function Get-VeeamCollectionFromFirstAvailablePath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [psobject]$Session,
+
+        [Parameter(Mandatory)]
+        [string[]]$Paths
+    )
+
+    $errors = [System.Collections.Generic.List[string]]::new()
+    foreach ($path in $Paths) {
+        try {
+            $items = @(Get-VeeamCollection -Session $Session -Path $path)
+            if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+                Write-CollectorLog -Message ("Using Veeam endpoint {0}" -f $path)
+            }
+            return $items
+        }
+        catch {
+            $errors.Add(('{0}: {1}' -f $path, $_.Exception.Message))
+            if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+                Write-CollectorLog -Message ("Veeam endpoint candidate failed: {0}: {1}" -f $path, $_.Exception.Message) -Level WARN
+            }
+        }
+    }
+
+    throw "No Veeam endpoint candidate succeeded. $($errors -join ' | ')"
+}
+
+function Invoke-VeeamFirstAvailablePath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [psobject]$Session,
+
+        [Parameter(Mandatory)]
+        [string[]]$Paths
+    )
+
+    $errors = [System.Collections.Generic.List[string]]::new()
+    foreach ($path in $Paths) {
+        try {
+            $response = Invoke-VeeamApi -Session $Session -Path $path
+            if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+                Write-CollectorLog -Message ("Using Veeam endpoint {0}" -f $path)
+            }
+            return $response
+        }
+        catch {
+            $errors.Add(('{0}: {1}' -f $path, $_.Exception.Message))
+            if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+                Write-CollectorLog -Message ("Veeam endpoint candidate failed: {0}: {1}" -f $path, $_.Exception.Message) -Level WARN
+            }
+        }
+    }
+
+    throw "No Veeam endpoint candidate succeeded. $($errors -join ' | ')"
+}
+
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Connect-VeeamApi, Invoke-VeeamApi, Invoke-VeeamFirstAvailablePath, Get-VeeamCollection, Get-VeeamCollectionFromFirstAvailablePath, Set-CollectorCertificatePolicy }

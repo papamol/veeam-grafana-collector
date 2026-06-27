@@ -102,12 +102,15 @@ pwsh -File .\src\Collector.ps1 -ConfigPath .\config.json
 - `veeam_restore_points`
 - `veeam_repository`
 - `veeam_sobr`
+- `veeam_object_storage`
 - `veeam_replication`
 - `veeam_tape`
 - `veeam_proxy`
 - `veeam_endpoint_status`
 - `veeam_gateway`
 - `veeam_mount_server`
+- `veeam_version_info`
+- `veeam_license_info`
 
 ## Dashboards
 

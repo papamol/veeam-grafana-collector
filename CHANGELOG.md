@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
-## [0.2.0] - Unreleased
+## [0.2.0] - 2026-06-27
 
 ### Added
 
@@ -12,6 +12,17 @@ This project follows Semantic Versioning.
 - Added optional `Collection` configuration for page size, max pages, request timeout, and per-endpoint max page overrides.
 - Added `veeam_endpoint_status` metrics so dashboards can distinguish skipped or unsupported Veeam endpoints from true no-data conditions.
 - Added overview dashboard collector summary and endpoint coverage panels.
+- Added Veeam version, license, and object storage metrics with graceful endpoint fallback.
+- Added VM inventory, object storage, server info, and license endpoint fallback support for Veeam REST version differences.
+- Added a complete dashboard suite for executive, backup, replication, tape, infrastructure, repository, protection, VM, and failed-job views.
+- Added richer VM protection classification for backup, backup copy, replication, both backup and replication, no backup, and stale protection states.
+- Added PSScriptAnalyzer settings and WiX bootstrap in CI/CD release workflows.
+
+### Changed
+
+- Improved tape collection to gather tape jobs, libraries, pools, media, capacity, and errors when exposed by the Veeam REST API.
+- Improved installer PowerShell 7 handling and added an InfluxDB read-back check after initial collection.
+- Added an upgrade `-SkipValidation` option for staging files when connectivity must be repaired separately.
 
 ## [0.1.16] - 2026-06-27
 

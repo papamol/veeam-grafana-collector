@@ -24,8 +24,8 @@ jobs:
       - name: Lint PowerShell
         shell: pwsh
         run: |
-          Invoke-ScriptAnalyzer -Path ./src -Recurse -Severity Warning,Error
-          Invoke-ScriptAnalyzer -Path ./installer -Recurse -Severity Warning,Error
+          Invoke-ScriptAnalyzer -Path ./src -Recurse -Severity Warning,Error -Settings ./PSScriptAnalyzerSettings.psd1
+          Invoke-ScriptAnalyzer -Path ./installer -Recurse -Severity Warning,Error -Settings ./PSScriptAnalyzerSettings.psd1
 
       - name: Run tests
         shell: pwsh
@@ -33,7 +33,7 @@ jobs:
 
       - name: Build release ZIP
         shell: pwsh
-        run: ./packaging/Build-Release.ps1 -Version 0.1.0
+        run: ./packaging/Build-Release.ps1 -Version 0.2.0
 
       - name: Upload package
         uses: actions/upload-artifact@v4

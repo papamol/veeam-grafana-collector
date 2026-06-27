@@ -1,0 +1,124 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "veeam"
+      ],
+      "title": "Drill Down",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "targets": [
+        {
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_tape\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"name\", \"resource_kind\", \"type\", \"pool\"], columnKey:[\"_field\"], valueColumn:\"_value\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Tape Resources",
+      "type": "table"
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": [
+    "veeam",
+    "msp",
+    "influxdb"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "label": "Datasource",
+        "name": "datasource",
+        "query": "influxdb",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "veeam_grafana_collector",
+          "value": "veeam_grafana_collector"
+        },
+        "label": "Bucket",
+        "name": "bucket",
+        "query": "veeam_grafana_collector",
+        "type": "textbox"
+      },
+      {
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
+        "label": "Customer",
+        "name": "customer",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
+        "type": "query"
+      },
+      {
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
+        "label": "Site",
+        "name": "site",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
+        "type": "query"
+      },
+      {
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
+        "label": "Server",
+        "name": "server",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
+        "type": "query"
+      },
+      {
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
+        "label": "Job Category",
+        "name": "job_category",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
+        "type": "query"
+      },
+      {
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
+        "label": "VM",
+        "name": "vm",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
+        "type": "query"
+      },
+      {
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
+        "label": "Repository",
+        "name": "repository",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "Veeam Grafana Collector - Tape",
+  "uid": "veeam-grafana-collector-tape",
+  "version": 1,
+  "weekStart": ""
+}

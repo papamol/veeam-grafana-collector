@@ -6,7 +6,29 @@ Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 function Get-VeeamTapeResources {
     [CmdletBinding()]
     param([Parameter(Mandatory)][psobject]$Session)
-    Get-VeeamCollection -Session $Session -Path '/v1/tape'
+
+    $resources = [System.Collections.Generic.List[object]]::new()
+    foreach ($definition in @(
+        @{ Kind = 'job'; Path = '/v1/jobs?type=Tape' },
+        @{ Kind = 'library'; Path = '/v1/tape/libraries' },
+        @{ Kind = 'pool'; Path = '/v1/tape/mediaPools' },
+        @{ Kind = 'media'; Path = '/v1/tape/media' },
+        @{ Kind = 'resource'; Path = '/v1/tape' }
+    )) {
+        try {
+            foreach ($item in @(Get-VeeamCollection -Session $Session -Path $definition.Path)) {
+                $item | Add-Member -NotePropertyName collectorResourceKind -NotePropertyValue $definition.Kind -Force
+                $resources.Add($item)
+            }
+        }
+        catch {
+            if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+                Write-CollectorLog -Message ("Skipping tape {0} endpoint {1}: {2}" -f $definition.Kind, $definition.Path, $_.Exception.Message) -Level WARN
+            }
+        }
+    }
+
+    return $resources.ToArray()
 }
 
 function ConvertTo-TapeMetrics {
@@ -20,7 +42,8 @@ function ConvertTo-TapeMetrics {
                 site = $Config.Site
                 server = $Config.ServerName
                 name = Get-PropertyValue -InputObject $tape -Names @('name') -Default 'unknown'
-                type = Get-PropertyValue -InputObject $tape -Names @('type') -Default 'unknown'
+                type = Get-PropertyValue -InputObject $tape -Names @('type') -Default (Get-PropertyValue -InputObject $tape -Names @('collectorResourceKind') -Default 'unknown')
+                resource_kind = Get-PropertyValue -InputObject $tape -Names @('collectorResourceKind') -Default 'unknown'
                 pool = Get-PropertyValue -InputObject $tape -Names @('poolName', 'pool') -Default ''
             }
             Fields = @{

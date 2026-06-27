@@ -19,6 +19,10 @@ jobs:
         shell: pwsh
         run: ./packaging/Build-Release.ps1 -Version ($env:GITHUB_REF_NAME).TrimStart('v')
 
+      - name: Install WiX Toolset
+        shell: pwsh
+        run: dotnet tool install --global wix
+
       - name: Build MSI
         shell: pwsh
         run: ./packaging/Build-Msi.ps1 -Version ($env:GITHUB_REF_NAME).TrimStart('v')

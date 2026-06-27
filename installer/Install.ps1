@@ -8,7 +8,23 @@ $ErrorActionPreference = 'Stop'
 
 function Assert-PowerShell7 {
     if ($PSVersionTable.PSVersion.Major -lt 7) {
-        throw 'PowerShell 7 or later is required. Install PowerShell 7 from https://github.com/PowerShell/PowerShell/releases and rerun the installer.'
+        $pwsh = Get-Command pwsh.exe -ErrorAction SilentlyContinue
+        if ($pwsh) {
+            & $pwsh.Source -NoProfile -ExecutionPolicy Bypass -File $PSCommandPath @PSBoundParameters
+            exit $LASTEXITCODE
+        }
+
+        $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
+        if ($winget) {
+            & $winget.Source install --id Microsoft.PowerShell --source winget --accept-package-agreements --accept-source-agreements
+            $pwsh = Get-Command pwsh.exe -ErrorAction SilentlyContinue
+            if ($pwsh) {
+                & $pwsh.Source -NoProfile -ExecutionPolicy Bypass -File $PSCommandPath @PSBoundParameters
+                exit $LASTEXITCODE
+            }
+        }
+
+        throw 'PowerShell 7 or later is required. Install PowerShell 7 and rerun the installer.'
     }
 }
 
@@ -38,6 +54,16 @@ $config = [ordered]@{
         Username = Read-RequiredValue 'Veeam Username'
         Password = $plainVeeamPassword
         IgnoreCertificateErrors = [bool]::Parse((Read-Host 'Ignore certificate errors? true/false'))
+        ApiVersion = '1.3-rev1'
+    }
+    Collection = [ordered]@{
+        PageSize = 1
+        MaxPages = 1
+        RequestTimeoutSeconds = 30
+        EndpointMaxPages = [ordered]@{
+            '/v1/sessions' = 10
+            '/v1/taskSessions' = 10
+        }
     }
     Influx = [ordered]@{
         Url = Read-RequiredValue 'InfluxDB URL'
@@ -55,6 +81,9 @@ New-Item -ItemType File -Path (Join-Path $InstallPath 'collector.log') -Force | 
 if ($LASTEXITCODE -ne 0) {
     throw "Initial collector validation failed. Review $(Join-Path $InstallPath 'collector.log') before creating the scheduled task."
 }
+
+$metricsQuery = 'from(bucket:"{0}") |> range(start: -15m) |> filter(fn: (r) => r._measurement == "veeam_server_summary" or r._measurement == "veeam_endpoint_status") |> limit(n:1)' -f $config.Influx.Bucket
+Invoke-RestMethod -Method Post -Uri "$($config.Influx.Url.TrimEnd('/'))/api/v2/query?org=$([uri]::EscapeDataString($config.Influx.Org))" -Headers @{ Authorization = "Token $($config.Influx.Token)"; Accept = 'application/csv' } -ContentType 'application/vnd.flux' -Body $metricsQuery | Out-Null
 
 $action = New-ScheduledTaskAction -Execute 'pwsh.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$InstallPath\src\Collector.ps1`" -ConfigPath `"$configPath`" -LogPath `"$InstallPath\collector.log`""
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(5) -RepetitionInterval (New-TimeSpan -Minutes 15)

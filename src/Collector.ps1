@@ -19,10 +19,12 @@ $moduleNames = @(
     'RestorePoints',
     'Repositories',
     'SOBR',
+    'ObjectStorage',
     'BackupCopy',
     'Replication',
     'Tape',
-    'Infrastructure'
+    'Infrastructure',
+    'SystemInfo'
 )
 
 foreach ($moduleName in $moduleNames) {
@@ -167,9 +169,12 @@ try {
     $restorePoints = @(Invoke-CollectorStep -Name 'restore points' -Endpoint '/v1/restorePoints' -ScriptBlock { Get-VeeamRestorePoints -Session $session })
     $repositories = @(Invoke-CollectorStep -Name 'repositories' -Endpoint '/v1/backupInfrastructure/repositories' -ScriptBlock { Get-VeeamRepositories -Session $session })
     $sobr = @(Invoke-CollectorStep -Name 'scale-out repositories' -Endpoint '/v1/backupInfrastructure/scaleOutRepositories' -ScriptBlock { Get-VeeamSOBR -Session $session })
+    $objectStorage = @(Invoke-CollectorStep -Name 'object storage repositories' -Endpoint '/v1/backupInfrastructure/objectStorageRepositories' -ScriptBlock { Get-VeeamObjectStorageRepositories -Session $session })
     $replicas = @(Invoke-CollectorStep -Name 'replication jobs' -Endpoint '/v1/jobs?type=Replication' -ScriptBlock { Get-VeeamReplicationJobs -Session $session })
     $tape = @(Invoke-CollectorStep -Name 'tape resources' -Endpoint '/v1/tape' -ScriptBlock { Get-VeeamTapeResources -Session $session })
     $infrastructure = Invoke-CollectorStep -Name 'infrastructure' -Endpoint '/v1/backupInfrastructure/*' -ScriptBlock { Get-VeeamInfrastructure -Session $session }
+    $serverInfo = Invoke-CollectorStep -Name 'server version' -Endpoint '/v1/serverInfo' -ScriptBlock { Get-VeeamServerInfo -Session $session }
+    $licenseInfo = Invoke-CollectorStep -Name 'license' -Endpoint '/v1/license' -ScriptBlock { Get-VeeamLicenseInfo -Session $session }
 
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-JobMetrics -Jobs $jobs -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-JobCategorySummaryMetrics -Jobs $jobs -Config $config)
@@ -177,12 +182,14 @@ try {
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-TaskSessionMetrics -TaskSessions $taskSessions -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-VMInventoryMetrics -VMs $vms -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-RestorePointMetrics -RestorePoints $restorePoints -Config $config)
-    Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-ProtectionMetrics -VMs $vms -RestorePoints $restorePoints -Config $config)
+    Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-ProtectionMetrics -VMs $vms -RestorePoints $restorePoints -TaskSessions $taskSessions -ReplicationJobs $replicas -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-RepositoryMetrics -Repositories $repositories -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-SOBRMetrics -Repositories $sobr -Config $config)
+    Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-ObjectStorageMetrics -Repositories $objectStorage -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-ReplicationMetrics -Replicas $replicas -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-TapeMetrics -TapeResources $tape -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-InfrastructureMetrics -Infrastructure $infrastructure -Config $config)
+    Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-SystemInfoMetrics -ServerInfo $serverInfo -LicenseInfo $licenseInfo -Config $config)
     Add-MetricLines -Lines $lines -MetricObjects @(ConvertTo-EndpointStatusMetrics -Statuses $script:EndpointStatuses.ToArray() -Config $config)
 
     $summaryTags = @{
@@ -195,6 +202,7 @@ try {
         sessions = [int]$sessions.Count
         vms = [int]$vms.Count
         repositories = [int]$repositories.Count
+        object_storage_repositories = [int]$objectStorage.Count
         restore_points = [int]$restorePoints.Count
     }
     $lines.Add((ConvertTo-InfluxLine -Measurement 'veeam_server_summary' -Tags $summaryTags -Fields $summaryFields))

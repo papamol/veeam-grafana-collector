@@ -26,6 +26,7 @@ $items = @(
     'LICENSE',
     'README.md',
     'CHANGELOG.md',
+    'PSScriptAnalyzerSettings.psd1',
     'SECURITY.md',
     'CONTRIBUTING.md',
     'CODE_OF_CONDUCT.md',

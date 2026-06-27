@@ -1,17 +1,19 @@
 # Grafana Dashboards
 
-Import `veeam-grafana-collector-overview.json` into Grafana and select the InfluxDB datasource.
+Import the JSON files into Grafana and select the InfluxDB datasource.
 
-The overview dashboard covers:
+Included dashboards:
 
-- Executive summary
-- Backup jobs
-- Replication
-- Tape
-- Infrastructure
-- Repositories
-- Protection
-- VM drill-downs
-- Failed jobs and failed VM task sessions
+- `veeam-grafana-collector-overview.json`
+- `veeam-grafana-collector-executive.json`
+- `veeam-grafana-collector-backup.json`
+- `veeam-grafana-collector-replication.json`
+- `veeam-grafana-collector-tape.json`
+- `veeam-grafana-collector-infrastructure.json`
+- `veeam-grafana-collector-repositories.json`
+- `veeam-grafana-collector-protection.json`
+- `veeam-grafana-collector-vm.json`
+- `veeam-grafana-collector-repository.json`
+- `veeam-grafana-collector-failed-jobs.json`
 
-The JSON includes variables for customer, site, server, job category, VM, and repository. Additional persona-specific dashboards can reuse the same Flux queries and variables.
+The JSON includes variables for customer, site, server, job category, VM, and repository. Dashboards include drill-down links so Grafana can navigate between related Veeam Collector dashboards while preserving variables and time range.

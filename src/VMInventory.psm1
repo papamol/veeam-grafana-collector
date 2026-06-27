@@ -6,7 +6,13 @@ Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 function Get-VeeamVMInventory {
     [CmdletBinding()]
     param([Parameter(Mandatory)][psobject]$Session)
-    Get-VeeamCollection -Session $Session -Path '/v1/inventory/vms'
+
+    Get-VeeamCollectionFromFirstAvailablePath -Session $Session -Paths @(
+        '/v1/inventory/vms',
+        '/v1/inventory/virtualMachines',
+        '/v1/inventory/vSphere/virtualMachines',
+        '/v1/inventory/hyperV/virtualMachines'
+    )
 }
 
 function ConvertTo-VMInventoryMetrics {
