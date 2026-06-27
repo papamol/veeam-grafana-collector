@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.15] - 2026-06-27
+
+### Fixed
+
+- Allowed infrastructure metric conversion to continue when optional infrastructure endpoints are missing.
+
 ## [0.1.14] - 2026-06-27
 
 ### Fixed

@@ -8,16 +8,39 @@ function Get-VeeamInfrastructure {
     param([Parameter(Mandatory)][psobject]$Session)
 
     [pscustomobject]@{
-        Proxies = Get-VeeamCollection -Session $Session -Path '/v1/backupInfrastructure/proxies'
-        Gateways = Get-VeeamCollection -Session $Session -Path '/v1/backupInfrastructure/gatewayServers'
-        MountServers = Get-VeeamCollection -Session $Session -Path '/v1/backupInfrastructure/mountServers'
-        WanAccelerators = Get-VeeamCollection -Session $Session -Path '/v1/backupInfrastructure/wanAccelerators'
+        Proxies = @(Invoke-InfrastructureCollection -Session $Session -Name 'proxies' -Path '/v1/backupInfrastructure/proxies')
+        Gateways = @(Invoke-InfrastructureCollection -Session $Session -Name 'gateway servers' -Path '/v1/backupInfrastructure/gatewayServers')
+        MountServers = @(Invoke-InfrastructureCollection -Session $Session -Name 'mount servers' -Path '/v1/backupInfrastructure/mountServers')
+        WanAccelerators = @(Invoke-InfrastructureCollection -Session $Session -Name 'WAN accelerators' -Path '/v1/backupInfrastructure/wanAccelerators')
+    }
+}
+
+function Invoke-InfrastructureCollection {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][psobject]$Session,
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][string]$Path
+    )
+
+    try {
+        Get-VeeamCollection -Session $Session -Path $Path
+    }
+    catch {
+        if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+            Write-CollectorLog -Message ("Skipping infrastructure {0}: {1}" -f $Name, $_.Exception.Message) -Level WARN
+        }
+        @()
     }
 }
 
 function ConvertTo-InfrastructureMetrics {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][psobject]$Infrastructure, [Parameter(Mandatory)][psobject]$Config)
+    param([AllowNull()][psobject]$Infrastructure, [Parameter(Mandatory)][psobject]$Config)
+
+    if ($null -eq $Infrastructure) {
+        return
+    }
 
     foreach ($proxy in @($Infrastructure.Proxies)) {
         [pscustomobject]@{
