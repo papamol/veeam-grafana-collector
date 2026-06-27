@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.13] - 2026-06-27
+
+### Fixed
+
+- Allowed metric aggregation to start with an empty metric line collection.
+
 ## [0.1.12] - 2026-06-27
 
 ### Fixed

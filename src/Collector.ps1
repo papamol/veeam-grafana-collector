@@ -51,11 +51,20 @@ foreach ($commandName in $requiredCommands) {
 
 function Add-MetricLines {
     param(
-        [Parameter(Mandatory)][System.Collections.Generic.List[string]]$Lines,
-        [Parameter(Mandatory)][object[]]$MetricObjects
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [System.Collections.Generic.List[string]]$Lines,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [object[]]$MetricObjects
     )
 
     foreach ($metric in $MetricObjects) {
+        if ($null -eq $metric) {
+            continue
+        }
+
         $Lines.Add((ConvertTo-InfluxLine -Measurement $metric.Measurement -Tags $metric.Tags -Fields $metric.Fields))
     }
 }
