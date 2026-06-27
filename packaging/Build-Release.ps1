@@ -13,7 +13,25 @@ $stage = Join-Path $artifacts "veeam-grafana-collector-$Version"
 Remove-Item -Path $stage -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Path $stage -Force | Out-Null
 
-$items = @('src', 'installer', 'dashboards', 'docs', 'examples', 'LICENSE', 'README.md', 'CHANGELOG.md', 'SECURITY.md', 'CONTRIBUTING.md', 'CODE_OF_CONDUCT.md')
+$items = @(
+    '.github',
+    'src',
+    'installer',
+    'dashboards',
+    'docs',
+    'examples',
+    'tests',
+    'packaging',
+    'wiki',
+    'LICENSE',
+    'README.md',
+    'CHANGELOG.md',
+    'SECURITY.md',
+    'CONTRIBUTING.md',
+    'CODE_OF_CONDUCT.md',
+    '.gitattributes',
+    '.gitignore'
+)
 foreach ($item in $items) {
     Copy-Item -Path (Join-Path $root $item) -Destination $stage -Recurse -Force
 }
