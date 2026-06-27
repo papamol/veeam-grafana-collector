@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.5] - 2026-06-27
+
+### Fixed
+
+- Added the required password grant type to Veeam REST API token requests.
+
 ## [0.1.4] - 2026-06-27
 
 ### Fixed

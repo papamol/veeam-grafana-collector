@@ -24,6 +24,7 @@ function Connect-VeeamApi {
     Set-CollectorCertificatePolicy -IgnoreCertificateErrors $ignoreCertificateErrors
 
     $body = @{
+        grant_type = 'password'
         username = $Config.Veeam.Username
         password = $Config.Veeam.Password
     }
