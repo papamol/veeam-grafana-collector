@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.9] - 2026-06-27
+
+### Fixed
+
+- Added after-response logging and a hard page cap for Veeam REST collection paging.
+
 ## [0.1.8] - 2026-06-27
 
 ### Fixed

@@ -123,17 +123,25 @@ function Get-VeeamCollection {
         [Parameter(Mandatory)]
         [string]$Path,
 
-        [int]$Limit = 1
+        [int]$Limit = 1,
+
+        [int]$MaxPages = 500
     )
 
     $results = [System.Collections.Generic.List[object]]::new()
     $offset = 0
+    $page = 0
 
     do {
+        $page++
+        if ($page -gt $MaxPages) {
+            throw "Stopped paging $Path after $MaxPages pages to prevent an endless collection loop."
+        }
+
         $separator = if ($Path.Contains('?')) { '&' } else { '?' }
         $pagedPath = '{0}{1}limit={2}&offset={3}' -f $Path, $separator, $Limit, $offset
         if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
-            Write-CollectorLog -Message ("Requesting {0}" -f $pagedPath)
+            Write-CollectorLog -Message ("Requesting {0} page {1}" -f $pagedPath, $page)
         }
         $response = Invoke-VeeamApi -Session $Session -Path $pagedPath
         $items = $null
@@ -149,17 +157,23 @@ function Get-VeeamCollection {
             $items = @($response)
         }
 
-        foreach ($item in $items) {
-            $results.Add($item)
-        }
-
-        $offset += $items.Count
         $total = if ($response.PSObject.Properties['pagination'] -and $response.pagination.PSObject.Properties['total']) {
             [int]$response.pagination.total
         }
         else {
             $null
         }
+
+        if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+            $totalText = if ($null -eq $total) { 'unknown' } else { [string]$total }
+            Write-CollectorLog -Message ("Received {0} item(s) from {1}; total={2}" -f $items.Count, $pagedPath, $totalText)
+        }
+
+        foreach ($item in $items) {
+            $results.Add($item)
+        }
+
+        $offset += $items.Count
     } while ($items.Count -eq $Limit -and ($null -eq $total -or $offset -lt $total))
 
     return $results.ToArray()
