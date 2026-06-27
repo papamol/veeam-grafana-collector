@@ -105,6 +105,7 @@ pwsh -File .\src\Collector.ps1 -ConfigPath .\config.json
 - `veeam_replication`
 - `veeam_tape`
 - `veeam_proxy`
+- `veeam_endpoint_status`
 - `veeam_gateway`
 - `veeam_mount_server`
 

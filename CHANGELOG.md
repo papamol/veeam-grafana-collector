@@ -10,6 +10,7 @@ This project follows Semantic Versioning.
 
 - Added the `v0.2.0` implementation checklist from the original project requirements.
 - Added optional `Collection` configuration for page size, max pages, request timeout, and per-endpoint max page overrides.
+- Added `veeam_endpoint_status` metrics so dashboards can distinguish skipped or unsupported Veeam endpoints from true no-data conditions.
 
 ## [0.1.16] - 2026-06-27
 
