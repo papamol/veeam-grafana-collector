@@ -1,0 +1,23 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Veeam Grafana Collector" Manufacturer="Veeam Grafana Collector contributors" Version="$(var.Version)" UpgradeCode="9E11C85E-1F9D-4AF3-9835-CB4C9D7E2221">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Veeam Grafana Collector is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <Feature Id="Main" Title="Veeam Grafana Collector" Level="1">
+      <ComponentGroupRef Id="CollectorFiles" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="VeeamGrafanaCollector" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="CollectorFiles" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="..\README.md" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
