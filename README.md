@@ -109,6 +109,10 @@ pwsh -File .\src\Collector.ps1 -ConfigPath .\config.json
 - `veeam_gateway`
 - `veeam_mount_server`
 
+## Dashboards
+
+The overview dashboard includes collector summary and endpoint coverage panels. Endpoint coverage uses `veeam_endpoint_status` so Grafana can show whether a missing panel is caused by no matching data, a skipped endpoint, a forbidden endpoint, or a Veeam REST endpoint that is unavailable in the installed Veeam version.
+
 ## Development
 
 ```powershell

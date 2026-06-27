@@ -24,10 +24,64 @@
         "uid": "$datasource"
       },
       "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 5,
+      "targets": [
+        {
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Collector Summary",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 16,
+        "x": 8,
+        "y": 0
+      },
+      "id": 6,
+      "targets": [
+        {
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_endpoint_status\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"collector\", \"endpoint\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"_time\", \"collector\", \"endpoint\", \"status\", \"available\", \"item_count\", \"duration_ms\", \"error\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Endpoint Coverage",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 5
       },
       "id": 1,
       "targets": [
@@ -48,7 +102,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 5
       },
       "id": 2,
       "targets": [
@@ -75,7 +129,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 13
       },
       "id": 3,
       "targets": [
@@ -96,7 +150,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 13
       },
       "id": 4,
       "targets": [
@@ -129,12 +183,12 @@
       {
         "current": {
           "selected": true,
-          "text": "veeam",
-          "value": "veeam"
+          "text": "veeam_grafana_collector",
+          "value": "veeam_grafana_collector"
         },
         "label": "Bucket",
         "name": "bucket",
-        "query": "veeam",
+        "query": "veeam_grafana_collector",
         "type": "textbox"
       },
       {
