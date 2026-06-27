@@ -39,4 +39,4 @@ function Write-CollectorLog {
     Write-Information $line -InformationAction Continue
 }
 
-Export-ModuleMember -Function Initialize-Logger, Write-CollectorLog
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Initialize-Logger, Write-CollectorLog }

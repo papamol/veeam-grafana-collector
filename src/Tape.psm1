@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
-Import-Module (Join-Path $PSScriptRoot 'Authentication.psm1') -Force
-Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'Authentication.psm1') -Force -Global
+Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 
 function Get-VeeamTapeResources {
     [CmdletBinding()]
@@ -32,4 +32,4 @@ function ConvertTo-TapeMetrics {
     }
 }
 
-Export-ModuleMember -Function Get-VeeamTapeResources, ConvertTo-TapeMetrics
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Get-VeeamTapeResources, ConvertTo-TapeMetrics }

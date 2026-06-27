@@ -170,4 +170,4 @@ function Get-JobCategory {
     }
 }
 
-Export-ModuleMember -Function Read-CollectorConfig, Test-CollectorConfig, ConvertTo-SafeTagValue, ConvertTo-InfluxFieldValue, Invoke-WithRetry, Get-PropertyValue, Get-JobCategory
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Read-CollectorConfig, Test-CollectorConfig, ConvertTo-SafeTagValue, ConvertTo-InfluxFieldValue, Invoke-WithRetry, Get-PropertyValue, Get-JobCategory }

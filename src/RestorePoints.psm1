@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
-Import-Module (Join-Path $PSScriptRoot 'Authentication.psm1') -Force
-Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'Authentication.psm1') -Force -Global
+Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 
 function Get-VeeamRestorePoints {
     [CmdletBinding()]
@@ -33,4 +33,4 @@ function ConvertTo-RestorePointMetrics {
     }
 }
 
-Export-ModuleMember -Function Get-VeeamRestorePoints, ConvertTo-RestorePointMetrics
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Get-VeeamRestorePoints, ConvertTo-RestorePointMetrics }

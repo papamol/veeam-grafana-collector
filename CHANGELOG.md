@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.2] - 2026-06-27
+
+### Fixed
+
+- Made collector module loading explicit and fail-fast during startup.
+- Made installer and upgrade scripts stop when validation collection fails.
+
 ## [0.1.1] - 2026-06-26
 
 ### Fixed

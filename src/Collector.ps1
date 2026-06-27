@@ -26,7 +26,27 @@ $moduleNames = @(
 )
 
 foreach ($moduleName in $moduleNames) {
-    Import-Module (Join-Path $PSScriptRoot "$moduleName.psm1") -Force
+    $modulePath = Join-Path $PSScriptRoot "$moduleName.psm1"
+    if (-not (Test-Path $modulePath)) {
+        throw "Required module not found: $modulePath"
+    }
+
+    Import-Module $modulePath -Force -Global
+}
+
+$requiredCommands = @(
+    'Initialize-Logger',
+    'Write-CollectorLog',
+    'Read-CollectorConfig',
+    'Connect-VeeamApi',
+    'ConvertTo-InfluxLine',
+    'Write-InfluxMetrics'
+)
+
+foreach ($commandName in $requiredCommands) {
+    if (-not (Get-Command -Name $commandName -ErrorAction SilentlyContinue)) {
+        throw "Required collector command was not loaded: $commandName"
+    }
 }
 
 function Add-MetricLines {

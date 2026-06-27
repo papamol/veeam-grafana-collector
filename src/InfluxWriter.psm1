@@ -1,6 +1,6 @@
 Set-StrictMode -Version Latest
 
-Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 
 function ConvertTo-InfluxLine {
     [CmdletBinding()]
@@ -61,4 +61,4 @@ function Write-InfluxMetrics {
     } | Out-Null
 }
 
-Export-ModuleMember -Function ConvertTo-InfluxLine, Write-InfluxMetrics
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function ConvertTo-InfluxLine, Write-InfluxMetrics }

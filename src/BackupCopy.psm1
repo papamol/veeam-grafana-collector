@@ -1,6 +1,6 @@
 Set-StrictMode -Version Latest
 
-Import-Module (Join-Path $PSScriptRoot 'Authentication.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'Authentication.psm1') -Force -Global
 
 function Get-VeeamBackupCopyJobs {
     [CmdletBinding()]
@@ -8,4 +8,4 @@ function Get-VeeamBackupCopyJobs {
     Get-VeeamCollection -Session $Session -Path '/v1/jobs?type=BackupCopy'
 }
 
-Export-ModuleMember -Function Get-VeeamBackupCopyJobs
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Get-VeeamBackupCopyJobs }

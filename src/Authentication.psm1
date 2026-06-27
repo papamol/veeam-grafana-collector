@@ -1,6 +1,6 @@
 Set-StrictMode -Version Latest
 
-Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 
 function Set-CollectorCertificatePolicy {
     [CmdletBinding()]
@@ -94,4 +94,4 @@ function Get-VeeamCollection {
     return @($response)
 }
 
-Export-ModuleMember -Function Connect-VeeamApi, Invoke-VeeamApi, Get-VeeamCollection, Set-CollectorCertificatePolicy
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Connect-VeeamApi, Invoke-VeeamApi, Get-VeeamCollection, Set-CollectorCertificatePolicy }

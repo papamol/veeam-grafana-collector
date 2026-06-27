@@ -1,6 +1,6 @@
 Set-StrictMode -Version Latest
 
-Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 
 function ConvertTo-ProtectionMetrics {
     [CmdletBinding()]
@@ -46,4 +46,4 @@ function ConvertTo-ProtectionMetrics {
     }
 }
 
-Export-ModuleMember -Function ConvertTo-ProtectionMetrics
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function ConvertTo-ProtectionMetrics }

@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
-Import-Module (Join-Path $PSScriptRoot 'Authentication.psm1') -Force
-Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'Authentication.psm1') -Force -Global
+Import-Module (Join-Path $PSScriptRoot 'Utilities.psm1') -Force -Global
 
 function Get-VeeamRepositories {
     [CmdletBinding()]
@@ -32,4 +32,4 @@ function ConvertTo-RepositoryMetrics {
     }
 }
 
-Export-ModuleMember -Function Get-VeeamRepositories, ConvertTo-RepositoryMetrics
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Get-VeeamRepositories, ConvertTo-RepositoryMetrics }

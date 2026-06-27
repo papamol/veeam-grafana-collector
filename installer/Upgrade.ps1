@@ -19,5 +19,8 @@ Copy-Item -Path (Join-Path $root '*') -Destination $InstallPath -Recurse -Force
 Copy-Item -Path (Join-Path $backupPath 'config.json') -Destination (Join-Path $InstallPath 'config.json') -Force
 
 & pwsh -NoProfile -File (Join-Path $InstallPath 'src\Collector.ps1') -ConfigPath (Join-Path $InstallPath 'config.json') -LogPath (Join-Path $InstallPath 'collector.log')
+if ($LASTEXITCODE -ne 0) {
+    throw "Post-upgrade collector validation failed. Review $(Join-Path $InstallPath 'collector.log')."
+}
 
 Write-Host "Upgrade complete. Backup created at $backupPath"

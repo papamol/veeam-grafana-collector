@@ -52,6 +52,9 @@ $config | ConvertTo-Json -Depth 10 | Set-Content -Path $configPath -Encoding UTF
 New-Item -ItemType File -Path (Join-Path $InstallPath 'collector.log') -Force | Out-Null
 
 & pwsh -NoProfile -File (Join-Path $InstallPath 'src\Collector.ps1') -ConfigPath $configPath -LogPath (Join-Path $InstallPath 'collector.log')
+if ($LASTEXITCODE -ne 0) {
+    throw "Initial collector validation failed. Review $(Join-Path $InstallPath 'collector.log') before creating the scheduled task."
+}
 
 $action = New-ScheduledTaskAction -Execute 'pwsh.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$InstallPath\src\Collector.ps1`" -ConfigPath `"$configPath`" -LogPath `"$InstallPath\collector.log`""
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(5) -RepetitionInterval (New-TimeSpan -Minutes 15)
