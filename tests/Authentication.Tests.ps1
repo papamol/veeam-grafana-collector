@@ -7,7 +7,7 @@ Describe 'Get-VeeamCollection' {
         $requestedUris = [System.Collections.Generic.List[string]]::new()
         Mock Invoke-RestMethod {
             $requestedUris.Add($Uri)
-            if ($Uri -like '*offset=0') {
+            if ($Uri -like '*skip=0') {
                 return [pscustomobject]@{
                     data = @(
                         [pscustomobject]@{ id = 'job-1' },
@@ -37,7 +37,7 @@ Describe 'Get-VeeamCollection' {
         $result = Get-VeeamCollection -Session $session -Path '/v1/jobs?type=Replication' -Limit 2
 
         $result.Count | Should -Be 3
-        $requestedUris[0] | Should -Be 'https://localhost:9419/api/v1/jobs?type=Replication&limit=2&offset=0'
-        $requestedUris[1] | Should -Be 'https://localhost:9419/api/v1/jobs?type=Replication&limit=2&offset=2'
+        $requestedUris[0] | Should -Be 'https://localhost:9419/api/v1/jobs?type=Replication&limit=2&skip=0'
+        $requestedUris[1] | Should -Be 'https://localhost:9419/api/v1/jobs?type=Replication&limit=2&skip=2'
     }
 }

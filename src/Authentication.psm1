@@ -139,7 +139,7 @@ function Get-VeeamCollection {
         }
 
         $separator = if ($Path.Contains('?')) { '&' } else { '?' }
-        $pagedPath = '{0}{1}limit={2}&offset={3}' -f $Path, $separator, $Limit, $offset
+        $pagedPath = '{0}{1}limit={2}&skip={3}' -f $Path, $separator, $Limit, $offset
         if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
             Write-CollectorLog -Message ("Requesting {0} page {1}" -f $pagedPath, $page)
         }

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.10] - 2026-06-27
+
+### Fixed
+
+- Used Veeam's `skip` paging parameter instead of `offset`.
+
 ## [0.1.9] - 2026-06-27
 
 ### Fixed
