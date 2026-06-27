@@ -1,0 +1,17 @@
+{
+  "Customer": "Example Customer",
+  "Site": "Primary",
+  "ServerName": "VBR01",
+  "Veeam": {
+    "BaseUrl": "https://localhost:9419/api",
+    "Username": "DOMAIN\\svc-veeam-api",
+    "Password": "replace-me",
+    "IgnoreCertificateErrors": false
+  },
+  "Influx": {
+    "Url": "https://influx.example.com",
+    "Org": "msp",
+    "Bucket": "veeam",
+    "Token": "replace-me"
+  }
+}

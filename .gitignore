@@ -1,0 +1,10 @@
+.DS_Store
+*.log
+*.zip
+*.msi
+*.nupkg
+TestResults/
+artifacts/
+config.json
+collector.log
+.vscode/
