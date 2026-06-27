@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.1.8] - 2026-06-27
+
+### Fixed
+
+- Reduced Veeam REST page size to one item for slow job endpoints.
+- Logged each paged Veeam request during collection.
+
 ## [0.1.7] - 2026-06-27
 
 ### Fixed

@@ -123,7 +123,7 @@ function Get-VeeamCollection {
         [Parameter(Mandatory)]
         [string]$Path,
 
-        [int]$Limit = 100
+        [int]$Limit = 1
     )
 
     $results = [System.Collections.Generic.List[object]]::new()
@@ -132,6 +132,9 @@ function Get-VeeamCollection {
     do {
         $separator = if ($Path.Contains('?')) { '&' } else { '?' }
         $pagedPath = '{0}{1}limit={2}&offset={3}' -f $Path, $separator, $Limit, $offset
+        if (Get-Command -Name Write-CollectorLog -ErrorAction SilentlyContinue) {
+            Write-CollectorLog -Message ("Requesting {0}" -f $pagedPath)
+        }
         $response = Invoke-VeeamApi -Session $Session -Path $pagedPath
         $items = $null
 
@@ -151,7 +154,13 @@ function Get-VeeamCollection {
         }
 
         $offset += $items.Count
-    } while ($items.Count -eq $Limit)
+        $total = if ($response.PSObject.Properties['pagination'] -and $response.pagination.PSObject.Properties['total']) {
+            [int]$response.pagination.total
+        }
+        else {
+            $null
+        }
+    } while ($items.Count -eq $Limit -and ($null -eq $total -or $offset -lt $total))
 
     return $results.ToArray()
 }
