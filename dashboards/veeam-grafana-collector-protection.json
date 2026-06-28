@@ -1,110 +1,491 @@
 {
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "editable": true,
-  "graphTooltip": 1,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
   "links": [
     {
-      "asDropdown": true,
-      "icon": "external link",
-      "includeVars": true,
-      "keepTime": true,
-      "tags": [
-        "veeam"
-      ],
-      "title": "Drill Down",
-      "type": "dashboards"
+      "title": "Overview",
+      "url": "/d/veeam-grafana-collector-overview/veeam-grafana-collector-overview?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}",
+      "type": "link"
+    },
+    {
+      "title": "Protection",
+      "url": "/d/veeam-grafana-collector-protection/veeam-grafana-collector-protection?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}",
+      "type": "link"
+    },
+    {
+      "title": "Failed Jobs",
+      "url": "/d/veeam-grafana-collector-failed-jobs/veeam-grafana-collector-failed-jobs?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}",
+      "type": "link"
     }
   ],
   "panels": [
     {
+      "id": 1,
+      "type": "stat",
+      "title": "Protected VMs",
+      "description": "",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
-      "description": "Summary of protection flags. protected=1 means a backup restore point was found. no_backup=1 means this VM is known to the collector but no backup restore point was found. stale_backup/stale_replication indicate stale or missing recent protection.",
       "gridPos": {
-        "h": 5,
-        "w": 24,
+        "h": 4,
+        "w": 6,
         "x": 0,
         "y": 0
       },
-      "id": 1,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "showPercentChange": false
+      },
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\" or r._field == \"no_backup\" or r._field == \"stale_backup\" or r._field == \"stale_replication\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()",
-          "refId": "A"
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"_measurement\", \"_field\", \"vm\"])\n  |> last()\n  |> group(columns:[\"_measurement\", \"_field\"])\n  |> sum()"
         }
-      ],
-      "title": "Protection Summary",
-      "type": "stat"
+      ]
     },
     {
+      "id": 2,
+      "type": "stat",
+      "title": "No Backup VMs",
+      "description": "",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
-      "description": "This is the main list for VMs not being backed up. A VM can only appear here if Veeam exposes it through inventory, restore points, task sessions, or replication jobs.",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "showPercentChange": false
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"_measurement\", \"_field\", \"vm\"])\n  |> last()\n  |> group(columns:[\"_measurement\", \"_field\"])\n  |> sum()"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Stale Backup VMs",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "showPercentChange": false
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"stale_backup\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"_measurement\", \"_field\", \"vm\"])\n  |> last()\n  |> group(columns:[\"_measurement\", \"_field\"])\n  |> sum()"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Replication VMs",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "showPercentChange": false
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"replication\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"_measurement\", \"_field\", \"vm\"])\n  |> last()\n  |> group(columns:[\"_measurement\", \"_field\"])\n  |> sum()"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "VMs With No Backup",
+      "description": "Click a VM name to inspect its sessions and inventory detail.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 5
+        "y": 4
       },
-      "id": 3,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vm"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open VM Drilldown",
+                    "url": "/d/veeam-grafana-collector-vm/veeam-grafana-collector-vm?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\" and r._value == 1)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> last()\n  |> keep(columns:[\"_time\", \"vm\", \"protection_status\", \"protection_type\", \"_value\"])\n  |> rename(columns:{_value:\"No backup\"})",
-          "refId": "A"
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.vm =~ /^${vm:regex}$/))\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"no_backup\", \"restore_point_count\", \"latest_restore_point_age_hours\"])\n  |> filter(fn: (r) => exists r.no_backup and r.no_backup == 1)"
         }
-      ],
-      "title": "VMs With No Backup",
-      "type": "table"
+      ]
     },
     {
+      "id": 6,
+      "type": "table",
+      "title": "Stale Protection",
+      "description": "VMs with old backup or replication evidence.",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
-      "description": "VMs with stale backup or stale replication flags.",
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 5
+        "y": 4
       },
-      "id": 4,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vm"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open VM Drilldown",
+                    "url": "/d/veeam-grafana-collector-vm/veeam-grafana-collector-vm?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"stale_backup\" or r._field == \"stale_replication\")\n  |> filter(fn: (r) => r._value == 1)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_type\", \"_field\"])\n  |> last()\n  |> keep(columns:[\"_time\", \"vm\", \"protection_type\", \"_field\", \"_value\"])\n  |> rename(columns:{_field:\"Stale flag\", _value:\"Is stale\"})",
-          "refId": "A"
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"stale_backup\" or r._field == \"stale_replication\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.vm =~ /^${vm:regex}$/))\n  |> group(columns:[\"vm\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"vm\", \"protection_type\", \"stale_backup\", \"stale_replication\", \"latest_restore_point_age_hours\"])\n  |> filter(fn: (r) => (exists r.stale_backup and r.stale_backup == 1) or (exists r.stale_replication and r.stale_replication == 1))"
         }
-      ],
-      "title": "Stale Protection",
-      "type": "table"
+      ]
     },
     {
+      "id": 7,
+      "type": "table",
+      "title": "All VM Protection Detail",
+      "description": "Full VM protection matrix from Veeam-visible data.",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
-      "description": "Full VM protection table. Set the VM variable or open the VM dashboard to drill into a specific VM.",
       "gridPos": {
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 13
       },
-      "id": 2,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vm"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open VM Drilldown",
+                    "url": "/d/veeam-grafana-collector-vm/veeam-grafana-collector-vm?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r.vm =~ /^${vm:regex}$/)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"protected\", \"no_backup\", \"backup\", \"backup_copy\", \"replication\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\"])",
-          "refId": "A"
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\" or r._field == \"no_backup\" or r._field == \"backup\" or r._field == \"backup_copy\" or r._field == \"replication\" or r._field == \"stale_backup\" or r._field == \"stale_replication\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.vm =~ /^${vm:regex}$/))\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"protected\", \"no_backup\", \"backup\", \"backup_copy\", \"replication\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\"])"
         }
-      ],
-      "title": "All VM Protection Detail",
-      "type": "table"
+      ]
     }
   ],
   "refresh": "5m",
@@ -112,70 +493,160 @@
   "style": "dark",
   "tags": [
     "veeam",
-    "msp",
-    "influxdb"
+    "influxdb",
+    "collector"
   ],
   "templating": {
     "list": [
       {
-        "current": {},
-        "label": "Datasource",
         "name": "datasource",
+        "label": "Datasource",
+        "type": "datasource",
         "query": "influxdb",
-        "type": "datasource"
+        "refresh": 1,
+        "current": {
+          "selected": true,
+          "text": "influxdb-veeam-grafana-collector",
+          "value": "veeam-grafana-collector-influx"
+        },
+        "options": []
       },
       {
+        "name": "bucket",
+        "label": "Bucket",
+        "type": "textbox",
+        "query": "veeam_grafana_collector",
         "current": {
           "selected": true,
           "text": "veeam_grafana_collector",
           "value": "veeam_grafana_collector"
-        },
-        "label": "Bucket",
-        "name": "bucket",
-        "query": "veeam_grafana_collector",
-        "type": "textbox"
+        }
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
-        "label": "Customer",
         "name": "customer",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
-        "type": "query"
+        "label": "Customer",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
-        "label": "Site",
         "name": "site",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
-        "type": "query"
+        "label": "Site",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
-        "label": "Server",
         "name": "server",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
-        "type": "query"
+        "label": "Server",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
-        "label": "Job Category",
         "name": "job_category",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
-        "type": "query"
+        "label": "Job Category",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
-        "label": "VM",
         "name": "vm",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
-        "type": "query"
+        "label": "VM",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
-        "label": "Repository",
         "name": "repository",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
-        "type": "query"
+        "label": "Repository",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")"
       }
     ]
   },
@@ -183,6 +654,7 @@
     "from": "now-24h",
     "to": "now"
   },
+  "timepicker": {},
   "timezone": "browser",
   "title": "Veeam Grafana Collector - Protection",
   "uid": "veeam-grafana-collector-protection",

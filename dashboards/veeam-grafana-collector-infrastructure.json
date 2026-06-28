@@ -1,85 +1,265 @@
 {
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "editable": true,
-  "graphTooltip": 1,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
   "links": [
     {
-      "asDropdown": true,
-      "icon": "external link",
-      "includeVars": true,
-      "keepTime": true,
-      "tags": [
-        "veeam"
-      ],
-      "title": "Drill Down",
-      "type": "dashboards"
+      "title": "Overview",
+      "url": "/d/veeam-grafana-collector-overview/veeam-grafana-collector-overview?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}",
+      "type": "link"
+    },
+    {
+      "title": "Protection",
+      "url": "/d/veeam-grafana-collector-protection/veeam-grafana-collector-protection?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}",
+      "type": "link"
+    },
+    {
+      "title": "Failed Jobs",
+      "url": "/d/veeam-grafana-collector-failed-jobs/veeam-grafana-collector-failed-jobs?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}",
+      "type": "link"
     }
   ],
   "panels": [
     {
+      "id": 1,
+      "type": "table",
+      "title": "Backup Proxies",
+      "description": "",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 12,
         "x": 0,
         "y": 0
       },
-      "id": 1,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_proxy\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"proxy\"], columnKey:[\"_field\"], valueColumn:\"_value\")",
-          "refId": "A"
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_proxy\")\n  |> filter(fn: (r) => r._field == \"enabled\" or r._field == \"max_tasks\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"proxy\", \"_field\"])\n  |> last()\n  |> group(columns:[\"proxy\"])\n  |> pivot(rowKey:[\"proxy\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"proxy\", \"enabled\", \"max_tasks\"])"
         }
-      ],
-      "title": "Proxies",
-      "type": "table"
+      ]
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "$datasource"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 0
-      },
       "id": 2,
-      "targets": [
-        {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_gateway\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"gateway\"], columnKey:[\"_field\"], valueColumn:\"_value\")",
-          "refId": "A"
-        }
-      ],
-      "title": "Gateways",
-      "type": "table"
-    },
-    {
+      "type": "table",
+      "title": "Gateway Servers",
+      "description": "",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
+        "w": 12,
+        "x": 12,
         "y": 0
       },
-      "id": 3,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_mount_server\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"mount_server\"], columnKey:[\"_field\"], valueColumn:\"_value\")",
-          "refId": "A"
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_gateway\")\n  |> filter(fn: (r) => r._field == \"enabled\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"gateway\", \"_field\"])\n  |> last()\n  |> group(columns:[\"gateway\"])\n  |> pivot(rowKey:[\"gateway\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"gateway\", \"enabled\"])"
         }
-      ],
+      ]
+    },
+    {
+      "id": 3,
+      "type": "table",
       "title": "Mount Servers",
-      "type": "table"
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_mount_server\")\n  |> filter(fn: (r) => r._field == \"enabled\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"mount_server\", \"_field\"])\n  |> last()\n  |> group(columns:[\"mount_server\"])\n  |> pivot(rowKey:[\"mount_server\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"mount_server\", \"enabled\"])"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "Infrastructure Endpoint Health",
+      "description": "Shows which infrastructure sub-endpoints Veeam allowed the collector to read.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_endpoint_status\")\n  |> filter(fn: (r) => r._field == \"available\" or r._field == \"item_count\" or r._field == \"duration_ms\" or r._field == \"error\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.collector =~ /infrastructure/))\n  |> group(columns:[\"collector\", \"endpoint\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"collector\", \"endpoint\", \"status\"])\n  |> pivot(rowKey:[\"collector\", \"endpoint\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"collector\", \"endpoint\", \"status\", \"available\", \"item_count\", \"duration_ms\", \"error\"])"
+        }
+      ]
     }
   ],
   "refresh": "5m",
@@ -87,70 +267,160 @@
   "style": "dark",
   "tags": [
     "veeam",
-    "msp",
-    "influxdb"
+    "influxdb",
+    "collector"
   ],
   "templating": {
     "list": [
       {
-        "current": {},
-        "label": "Datasource",
         "name": "datasource",
+        "label": "Datasource",
+        "type": "datasource",
         "query": "influxdb",
-        "type": "datasource"
+        "refresh": 1,
+        "current": {
+          "selected": true,
+          "text": "influxdb-veeam-grafana-collector",
+          "value": "veeam-grafana-collector-influx"
+        },
+        "options": []
       },
       {
+        "name": "bucket",
+        "label": "Bucket",
+        "type": "textbox",
+        "query": "veeam_grafana_collector",
         "current": {
           "selected": true,
           "text": "veeam_grafana_collector",
           "value": "veeam_grafana_collector"
-        },
-        "label": "Bucket",
-        "name": "bucket",
-        "query": "veeam_grafana_collector",
-        "type": "textbox"
+        }
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
-        "label": "Customer",
         "name": "customer",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
-        "type": "query"
+        "label": "Customer",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
-        "label": "Site",
         "name": "site",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
-        "type": "query"
+        "label": "Site",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
-        "label": "Server",
         "name": "server",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
-        "type": "query"
+        "label": "Server",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
-        "label": "Job Category",
         "name": "job_category",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
-        "type": "query"
+        "label": "Job Category",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
-        "label": "VM",
         "name": "vm",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
-        "type": "query"
+        "label": "VM",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
-        "label": "Repository",
         "name": "repository",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
-        "type": "query"
+        "label": "Repository",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")"
       }
     ]
   },
@@ -158,6 +428,7 @@
     "from": "now-24h",
     "to": "now"
   },
+  "timepicker": {},
   "timezone": "browser",
   "title": "Veeam Grafana Collector - Infrastructure",
   "uid": "veeam-grafana-collector-infrastructure",

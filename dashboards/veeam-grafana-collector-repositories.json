@@ -1,24 +1,47 @@
 {
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "editable": true,
-  "graphTooltip": 1,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
   "links": [
     {
-      "asDropdown": true,
-      "icon": "external link",
-      "includeVars": true,
-      "keepTime": true,
-      "tags": [
-        "veeam"
-      ],
-      "title": "Drill Down",
-      "type": "dashboards"
+      "title": "Overview",
+      "url": "/d/veeam-grafana-collector-overview/veeam-grafana-collector-overview?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}",
+      "type": "link"
+    },
+    {
+      "title": "Protection",
+      "url": "/d/veeam-grafana-collector-protection/veeam-grafana-collector-protection?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}",
+      "type": "link"
+    },
+    {
+      "title": "Failed Jobs",
+      "url": "/d/veeam-grafana-collector-failed-jobs/veeam-grafana-collector-failed-jobs?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}",
+      "type": "link"
     }
   ],
   "panels": [
     {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Repository Capacity Over Time",
+      "description": "",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
@@ -29,23 +52,80 @@
         "x": 0,
         "y": 0
       },
-      "id": 1,
-      "targets": [
-        {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_repository\")\n  |> filter(fn: (r) => r._field == \"free_bytes\" or r._field == \"used_bytes\" or r._field == \"capacity_bytes\")\n  |> filter(fn: (r) => r.repository =~ /^${repository:regex}$/)\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
-          "refId": "A"
-        }
-      ],
-      "title": "Repository Capacity",
-      "type": "timeseries",
       "fieldConfig": {
         "defaults": {
-          "unit": "bytes"
+          "unit": "bytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "auto",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisColorMode": "text",
+            "axisBorderShow": false,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
-      }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_repository\")\n  |> filter(fn: (r) => r._field == \"free_bytes\" or r._field == \"used_bytes\" or r._field == \"capacity_bytes\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.repository =~ /^${repository:regex}$/))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"
+        }
+      ]
     },
     {
+      "id": 2,
+      "type": "table",
+      "title": "Repository Detail",
+      "description": "Repository capacity and immutability.",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
@@ -56,15 +136,120 @@
         "x": 12,
         "y": 0
       },
-      "id": 2,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "repository"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open Repository Drilldown",
+                    "url": "/d/veeam-grafana-collector-repository/veeam-grafana-collector-repository?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-repository=${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
       "targets": [
         {
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_object_storage\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"repository\", \"type\", \"immutable\"], columnKey:[\"_field\"], valueColumn:\"_value\")",
-          "refId": "A"
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_repository\")\n  |> filter(fn: (r) => r._field == \"capacity_bytes\" or r._field == \"free_bytes\" or r._field == \"used_bytes\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.repository =~ /^${repository:regex}$/))\n  |> group(columns:[\"repository\", \"type\", \"immutable\", \"_field\"])\n  |> last()\n  |> group(columns:[\"repository\", \"type\", \"immutable\"])\n  |> pivot(rowKey:[\"repository\", \"type\", \"immutable\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"repository\", \"type\", \"immutable\", \"capacity_bytes\", \"free_bytes\", \"used_bytes\"])"
         }
-      ],
-      "title": "Object Storage",
-      "type": "table"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Object Storage Repositories",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_object_storage\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"repository\", \"type\", \"immutable\", \"_field\"])\n  |> last()\n  |> group(columns:[\"repository\", \"type\", \"immutable\"])\n  |> pivot(rowKey:[\"repository\", \"type\", \"immutable\"], columnKey:[\"_field\"], valueColumn:\"_value\")"
+        }
+      ]
     }
   ],
   "refresh": "5m",
@@ -72,70 +257,160 @@
   "style": "dark",
   "tags": [
     "veeam",
-    "msp",
-    "influxdb"
+    "influxdb",
+    "collector"
   ],
   "templating": {
     "list": [
       {
-        "current": {},
-        "label": "Datasource",
         "name": "datasource",
+        "label": "Datasource",
+        "type": "datasource",
         "query": "influxdb",
-        "type": "datasource"
+        "refresh": 1,
+        "current": {
+          "selected": true,
+          "text": "influxdb-veeam-grafana-collector",
+          "value": "veeam-grafana-collector-influx"
+        },
+        "options": []
       },
       {
+        "name": "bucket",
+        "label": "Bucket",
+        "type": "textbox",
+        "query": "veeam_grafana_collector",
         "current": {
           "selected": true,
           "text": "veeam_grafana_collector",
           "value": "veeam_grafana_collector"
-        },
-        "label": "Bucket",
-        "name": "bucket",
-        "query": "veeam_grafana_collector",
-        "type": "textbox"
+        }
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
-        "label": "Customer",
         "name": "customer",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
-        "type": "query"
+        "label": "Customer",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"customer\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
-        "label": "Site",
         "name": "site",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
-        "type": "query"
+        "label": "Site",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"site\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
-        "label": "Server",
         "name": "server",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
-        "type": "query"
+        "label": "Server",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"server\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
-        "label": "Job Category",
         "name": "job_category",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
-        "type": "query"
+        "label": "Job Category",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"job_category\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
-        "label": "VM",
         "name": "vm",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
-        "type": "query"
+        "label": "VM",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"vm\")"
       },
       {
-        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
-        "label": "Repository",
         "name": "repository",
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
-        "type": "query"
+        "label": "Repository",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "$datasource"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"repository\")"
       }
     ]
   },
@@ -143,6 +418,7 @@
     "from": "now-24h",
     "to": "now"
   },
+  "timepicker": {},
   "timezone": "browser",
   "title": "Veeam Grafana Collector - Repositories",
   "uid": "veeam-grafana-collector-repositories",

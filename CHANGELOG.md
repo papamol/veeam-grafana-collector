@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.2.3] - 2026-06-27
+
+### Fixed
+
+- Rebuilt the Grafana dashboard bundle under the original dashboard UIDs instead of side-copy dashboards.
+- Defaulted query variables to `All` so imported dashboards do not render blank when customer, site, server, VM, or repository variables are unset.
+- Added consistent VM and repository drill-down links across operational tables.
+- Reworked overview, executive, protection, backup, repository, VM, replication, tape, infrastructure, and failed-job dashboards around confirmed collector measurements.
+- Added dashboard bundle tests for valid JSON, required drill-down dashboards, and safe default variables.
+
 ## [0.2.2] - 2026-06-27
 
 ### Changed
