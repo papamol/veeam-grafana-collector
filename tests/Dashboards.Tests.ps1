@@ -41,6 +41,7 @@ Describe 'Grafana dashboard bundle' {
 
         $uids | Should -Contain 'veeam-grafana-collector-overview'
         $uids | Should -Contain 'veeam-grafana-collector-protection'
+        $uids | Should -Contain 'veeam-operations-protection'
         $uids | Should -Contain 'veeam-grafana-collector-vm'
         $uids | Should -Contain 'veeam-grafana-collector-repository'
         $uids | Should -Contain 'veeam-grafana-collector-failed-jobs'

@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.2.4] - 2026-06-27
+
+### Added
+
+- Added `Veeam Operations - Protection`, a simplified operator-first dashboard with large status tiles, readable tables, and direct VM drill-down links.
+
+### Changed
+
+- Increased dashboard table row height for better readability.
+- Reduced reliance on tiny time-series legends for primary protection views.
+
 ## [0.2.3] - 2026-06-27
 
 ### Fixed

@@ -39,7 +39,23 @@
   "panels": [
     {
       "id": 1,
-      "type": "timeseries",
+      "type": "text",
+      "title": "Dashboard Navigation",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "transparent": false,
+      "options": {
+        "mode": "markdown",
+        "content": "### Open drill-down views\n[Protection](/d/veeam-grafana-collector-protection/veeam-grafana-collector-protection?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}) &nbsp;&nbsp; [VM Detail](/d/veeam-grafana-collector-vm/veeam-grafana-collector-vm?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}) &nbsp;&nbsp; [Repositories](/d/veeam-grafana-collector-repositories/veeam-grafana-collector-repositories?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-repository=${repository}) &nbsp;&nbsp; [Failed Jobs](/d/veeam-grafana-collector-failed-jobs/veeam-grafana-collector-failed-jobs?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server})"
+      }
+    },
+    {
+      "id": 1,
+      "type": "table",
       "title": "Job Count by Category",
       "description": "",
       "datasource": {
@@ -50,7 +66,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -103,15 +119,15 @@
         "overrides": []
       },
       "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        },
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom",
-          "calcs": []
+        "showHeader": true,
+        "cellHeight": "lg",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
         }
       },
       "targets": [
@@ -134,7 +150,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -160,7 +176,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -173,7 +189,7 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_job_info\")\n  |> filter(fn: (r) => r._field == \"enabled\" or r._field == \"priority\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.job_category =~ /^${job_category:regex}$/))\n  |> group(columns:[\"job_name\", \"job_type\", \"job_category\", \"_field\"])\n  |> last()\n  |> group(columns:[\"job_name\", \"job_type\", \"job_category\"])\n  |> pivot(rowKey:[\"job_name\", \"job_type\", \"job_category\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"job_name\", \"job_type\", \"job_category\", \"enabled\", \"priority\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_job_info\")\n  |> filter(fn: (r) => r._field == \"enabled\" or r._field == \"priority\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.job_category =~ /^${job_category:regex}$/))\n  |> group(columns:[\"job_name\", \"job_type\", \"job_category\", \"_field\"])\n  |> last()\n  |> group(columns:[\"job_name\", \"job_type\", \"job_category\"])\n  |> pivot(rowKey:[\"job_name\", \"job_type\", \"job_category\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"job_name\", \"job_type\", \"job_category\", \"enabled\", \"priority\"])"
         }
       ]
     },
@@ -190,7 +206,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 10
       },
       "fieldConfig": {
         "defaults": {
@@ -216,7 +232,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -229,7 +245,7 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_job_session\")\n  |> filter(fn: (r) => r._field == \"duration_seconds\" or r._field == \"transferred_bytes\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.job_category =~ /^${job_category:regex}$/))\n  |> group(columns:[\"job_name\", \"job_category\", \"result\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"job_name\", \"job_category\", \"result\", \"status\"])\n  |> pivot(rowKey:[\"job_name\", \"job_category\", \"result\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"job_name\", \"job_category\", \"result\", \"status\", \"duration_seconds\", \"transferred_bytes\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_job_session\")\n  |> filter(fn: (r) => r._field == \"duration_seconds\" or r._field == \"transferred_bytes\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.job_category =~ /^${job_category:regex}$/))\n  |> group(columns:[\"job_name\", \"job_category\", \"result\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"job_name\", \"job_category\", \"result\", \"status\"])\n  |> pivot(rowKey:[\"job_name\", \"job_category\", \"result\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"job_name\", \"job_category\", \"result\", \"status\", \"duration_seconds\", \"transferred_bytes\"])"
         }
       ]
     }
@@ -404,6 +420,6 @@
   "timezone": "browser",
   "title": "Veeam Grafana Collector - Backup",
   "uid": "veeam-grafana-collector-backup",
-  "version": 1,
+  "version": 10001,
   "weekStart": ""
 }

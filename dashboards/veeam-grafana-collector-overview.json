@@ -39,6 +39,22 @@
   "panels": [
     {
       "id": 1,
+      "type": "text",
+      "title": "Dashboard Navigation",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "transparent": false,
+      "options": {
+        "mode": "markdown",
+        "content": "### Open drill-down views\n[Protection](/d/veeam-grafana-collector-protection/veeam-grafana-collector-protection?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}) &nbsp;&nbsp; [VM Detail](/d/veeam-grafana-collector-vm/veeam-grafana-collector-vm?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}) &nbsp;&nbsp; [Repositories](/d/veeam-grafana-collector-repositories/veeam-grafana-collector-repositories?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-repository=${repository}) &nbsp;&nbsp; [Failed Jobs](/d/veeam-grafana-collector-failed-jobs/veeam-grafana-collector-failed-jobs?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server})"
+      }
+    },
+    {
+      "id": 19676,
       "type": "stat",
       "title": "Jobs",
       "description": "",
@@ -47,10 +63,10 @@
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 4,
+        "h": 5,
         "w": 4,
         "x": 0,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -90,12 +106,12 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r._field == \"jobs\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r._field == \"jobs\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> group()"
         }
       ]
     },
     {
-      "id": 2,
+      "id": 53138,
       "type": "stat",
       "title": "Sessions",
       "description": "",
@@ -104,10 +120,10 @@
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 4,
+        "h": 5,
         "w": 4,
         "x": 4,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -147,12 +163,12 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r._field == \"sessions\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r._field == \"sessions\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> group()"
         }
       ]
     },
     {
-      "id": 3,
+      "id": 86404,
       "type": "stat",
       "title": "VMs Seen",
       "description": "",
@@ -161,10 +177,10 @@
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 4,
+        "h": 5,
         "w": 4,
         "x": 8,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -204,12 +220,12 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r._field == \"vms\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r._field == \"vms\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> group()"
         }
       ]
     },
     {
-      "id": 4,
+      "id": 4340,
       "type": "stat",
       "title": "Repositories",
       "description": "",
@@ -218,10 +234,10 @@
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 4,
+        "h": 5,
         "w": 4,
         "x": 12,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -261,12 +277,12 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r._field == \"repositories\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_server_summary\")\n  |> filter(fn: (r) => r._field == \"repositories\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> last()\n  |> group()"
         }
       ]
     },
     {
-      "id": 5,
+      "id": 60704,
       "type": "stat",
       "title": "No Backup VMs",
       "description": "",
@@ -275,10 +291,10 @@
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 4,
+        "h": 5,
         "w": 4,
         "x": 16,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -318,24 +334,24 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"_measurement\", \"_field\", \"vm\"])\n  |> last()\n  |> group(columns:[\"_measurement\", \"_field\"])\n  |> sum()"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"_field\"])\n  |> last()\n  |> group(columns:[\"_field\"])\n  |> sum()\n  |> group()"
         }
       ]
     },
     {
-      "id": 6,
+      "id": 29414,
       "type": "stat",
-      "title": "Failed VM Tasks",
+      "title": "Stale Backup VMs",
       "description": "",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 4,
+        "h": 5,
         "w": 4,
         "x": 20,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -375,24 +391,24 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_task_session\")\n  |> filter(fn: (r) => r._field == \"duration_seconds\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.result =~ /Failed|Error/ or r.status =~ /Failed|Error/))\n  |> group(columns:[\"_measurement\", \"_field\", \"vm\"])\n  |> last()\n  |> group(columns:[\"_measurement\", \"_field\"])\n  |> sum()"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"stale_backup\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"_field\"])\n  |> last()\n  |> group(columns:[\"_field\"])\n  |> sum()\n  |> group()"
         }
       ]
     },
     {
-      "id": 7,
+      "id": 12127,
       "type": "table",
       "title": "VMs With No Backup",
-      "description": "VMs where Veeam-visible data shows no backup restore point. Click a VM name to drill into VM detail.",
+      "description": "VMs Veeam exposes where no backup restore point was found. Click the VM name for detail.",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 0,
-        "y": 4
+        "y": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -403,13 +419,31 @@
             },
             "inspect": false
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "No",
+                  "color": "green"
+                },
+                "1": {
+                  "text": "Yes",
+                  "color": "red"
+                }
+              }
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
               }
             ]
           }
@@ -425,10 +459,122 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "Open VM Drilldown",
+                    "title": "Open VM detail",
                     "url": "/d/veeam-grafana-collector-vm/veeam-grafana-collector-vm?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${__value.raw}"
                   }
                 ]
+              },
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vm"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job_name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "repository"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "failure_message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 420
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 520
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "endpoint"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 360
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "collector"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
               }
             ]
           }
@@ -436,7 +582,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -449,24 +595,24 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r._field == \"no_backup\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\"))\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"no_backup\", \"restore_point_count\", \"latest_restore_point_age_hours\"])\n  |> filter(fn: (r) => exists r.no_backup and r.no_backup == 1)"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"no_backup\", \"restore_point_count\", \"latest_restore_point_age_hours\"])\n  |> filter(fn: (r) => exists r.no_backup and r.no_backup == 1)\n  |> sort(columns:[\"vm\"])"
         }
       ]
     },
     {
-      "id": 8,
+      "id": 97006,
       "type": "table",
       "title": "All VM Protection Detail",
-      "description": "Current protection status for every VM Veeam exposed to the collector.",
+      "description": "Full protection matrix. Click the VM name for detail.",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 12,
-        "y": 4
+        "y": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -477,13 +623,31 @@
             },
             "inspect": false
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "No",
+                  "color": "green"
+                },
+                "1": {
+                  "text": "Yes",
+                  "color": "red"
+                }
+              }
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
               }
             ]
           }
@@ -499,10 +663,122 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "Open VM Drilldown",
+                    "title": "Open VM detail",
                     "url": "/d/veeam-grafana-collector-vm/veeam-grafana-collector-vm?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${__value.raw}"
                   }
                 ]
+              },
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vm"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job_name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "repository"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "failure_message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 420
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 520
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "endpoint"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 360
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "collector"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
               }
             ]
           }
@@ -510,7 +786,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -523,13 +799,13 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\" or r._field == \"no_backup\" or r._field == \"backup\" or r._field == \"backup_copy\" or r._field == \"replication\" or r._field == \"stale_backup\" or r._field == \"stale_replication\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.vm =~ /^${vm:regex}$/))\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"protected\", \"no_backup\", \"backup\", \"backup_copy\", \"replication\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\" or r._field == \"no_backup\" or r._field == \"backup\" or r._field == \"backup_copy\" or r._field == \"replication\" or r._field == \"stale_backup\" or r._field == \"stale_replication\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.vm =~ /^${vm:regex}$/))\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"protected\", \"no_backup\", \"backup\", \"backup_copy\", \"replication\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\"])\n  |> sort(columns:[\"no_backup\", \"stale_backup\", \"vm\"], desc: true)"
         }
       ]
     },
     {
-      "id": 9,
-      "type": "timeseries",
+      "id": 19180,
+      "type": "table",
       "title": "Jobs by Category",
       "description": "",
       "datasource": {
@@ -537,178 +813,10 @@
         "uid": "$datasource"
       },
       "gridPos": {
-        "h": 7,
+        "h": 8,
         "w": 8,
         "x": 0,
-        "y": 12
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "linear",
-            "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "spanNulls": false,
-            "insertNulls": false,
-            "showPoints": "auto",
-            "pointSize": 5,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            },
-            "axisPlacement": "auto",
-            "axisLabel": "",
-            "axisColorMode": "text",
-            "axisBorderShow": false,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        },
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom",
-          "calcs": []
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_job_category_summary\")\n  |> filter(fn: (r) => r._field == \"count\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"
-        }
-      ]
-    },
-    {
-      "id": 10,
-      "type": "timeseries",
-      "title": "Repository Capacity",
-      "description": "",
-      "datasource": {
-        "type": "influxdb",
-        "uid": "$datasource"
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 8,
-        "y": 12
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "linear",
-            "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "spanNulls": false,
-            "insertNulls": false,
-            "showPoints": "auto",
-            "pointSize": 5,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            },
-            "axisPlacement": "auto",
-            "axisLabel": "",
-            "axisColorMode": "text",
-            "axisBorderShow": false,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        },
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom",
-          "calcs": []
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_repository\")\n  |> filter(fn: (r) => r._field == \"free_bytes\" or r._field == \"used_bytes\" or r._field == \"capacity_bytes\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.repository =~ /^${repository:regex}$/))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"
-        }
-      ]
-    },
-    {
-      "id": 11,
-      "type": "table",
-      "title": "Latest Job Sessions",
-      "description": "",
-      "datasource": {
-        "type": "influxdb",
-        "uid": "$datasource"
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 16,
-        "y": 12
+        "y": 18
       },
       "fieldConfig": {
         "defaults": {
@@ -719,22 +827,149 @@
             },
             "inspect": false
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "No",
+                  "color": "green"
+                },
+                "1": {
+                  "text": "Yes",
+                  "color": "red"
+                }
+              }
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
               }
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vm"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job_name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "repository"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "failure_message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 420
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 520
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "endpoint"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 360
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "collector"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -747,24 +982,24 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_job_session\")\n  |> filter(fn: (r) => r._field == \"duration_seconds\" or r._field == \"transferred_bytes\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"job_name\", \"job_category\", \"result\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"job_name\", \"job_category\", \"result\", \"status\"])\n  |> pivot(rowKey:[\"job_name\", \"job_category\", \"result\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"job_name\", \"job_category\", \"result\", \"status\", \"duration_seconds\", \"transferred_bytes\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_job_category_summary\")\n  |> filter(fn: (r) => r._field == \"count\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.job_category =~ /^${job_category:regex}$/))\n  |> group(columns:[\"job_category\", \"_field\"])\n  |> last()\n  |> group(columns:[\"job_category\"])\n  |> pivot(rowKey:[\"job_category\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"job_category\", \"count\"])\n  |> sort(columns:[\"count\"], desc:true)"
         }
       ]
     },
     {
-      "id": 12,
+      "id": 19649,
       "type": "table",
-      "title": "Veeam API Collection Health",
-      "description": "Shows collector/API health. Success means the Veeam REST endpoint responded. Skipped/forbidden/not found means the collector could not read that optional endpoint; it does not mean backups failed.",
+      "title": "Repository Capacity",
+      "description": "Repository capacity with large readable rows.",
       "datasource": {
         "type": "influxdb",
         "uid": "$datasource"
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 19
+        "w": 8,
+        "x": 8,
+        "y": 18
       },
       "fieldConfig": {
         "defaults": {
@@ -775,22 +1010,170 @@
             },
             "inspect": false
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "No",
+                  "color": "green"
+                },
+                "1": {
+                  "text": "Yes",
+                  "color": "red"
+                }
+              }
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
               }
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "repository"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open repository detail",
+                    "url": "/d/veeam-grafana-collector-repository/veeam-grafana-collector-repository?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-repository=${__value.raw}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vm"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job_name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "repository"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "failure_message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 420
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 520
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "endpoint"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 360
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "collector"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -803,7 +1186,190 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_endpoint_status\")\n  |> filter(fn: (r) => r._field == \"available\" or r._field == \"item_count\" or r._field == \"duration_ms\" or r._field == \"error\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"collector\", \"endpoint\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"collector\", \"endpoint\", \"status\"])\n  |> pivot(rowKey:[\"collector\", \"endpoint\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"collector\", \"endpoint\", \"status\", \"available\", \"item_count\", \"duration_ms\", \"error\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_repository\")\n  |> filter(fn: (r) => r._field == \"capacity_bytes\" or r._field == \"free_bytes\" or r._field == \"used_bytes\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.repository =~ /^${repository:regex}$/))\n  |> group(columns:[\"repository\", \"type\", \"immutable\", \"_field\"])\n  |> last()\n  |> group(columns:[\"repository\", \"type\", \"immutable\"])\n  |> pivot(rowKey:[\"repository\", \"type\", \"immutable\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"repository\", \"type\", \"immutable\", \"capacity_bytes\", \"free_bytes\", \"used_bytes\"])"
+        }
+      ]
+    },
+    {
+      "id": 23527,
+      "type": "table",
+      "title": "Veeam API Collection Health",
+      "description": "Shows what the collector could and could not read from Veeam REST.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "$datasource"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 18
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "No",
+                  "color": "green"
+                },
+                "1": {
+                  "text": "Yes",
+                  "color": "red"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vm"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job_name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "repository"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "failure_message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 420
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 520
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "endpoint"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 360
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "collector"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "protection_type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "lg",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_endpoint_status\")\n  |> filter(fn: (r) => r._field == \"available\" or r._field == \"item_count\" or r._field == \"duration_ms\" or r._field == \"error\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"collector\", \"endpoint\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"collector\", \"endpoint\", \"status\"])\n  |> pivot(rowKey:[\"collector\", \"endpoint\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"collector\", \"endpoint\", \"status\", \"available\", \"item_count\", \"duration_ms\", \"error\"])\n  |> sort(columns:[\"status\", \"collector\"])"
         }
       ]
     }
@@ -828,8 +1394,7 @@
           "selected": true,
           "text": "influxdb-veeam-grafana-collector",
           "value": "veeam-grafana-collector-influx"
-        },
-        "options": []
+        }
       },
       {
         "name": "bucket",
@@ -978,6 +1543,6 @@
   "timezone": "browser",
   "title": "Veeam Grafana Collector - Overview",
   "uid": "veeam-grafana-collector-overview",
-  "version": 1,
+  "version": 10001,
   "weekStart": ""
 }

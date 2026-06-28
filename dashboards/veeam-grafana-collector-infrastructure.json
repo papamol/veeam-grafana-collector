@@ -39,6 +39,22 @@
   "panels": [
     {
       "id": 1,
+      "type": "text",
+      "title": "Dashboard Navigation",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "transparent": false,
+      "options": {
+        "mode": "markdown",
+        "content": "### Open drill-down views\n[Protection](/d/veeam-grafana-collector-protection/veeam-grafana-collector-protection?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}) &nbsp;&nbsp; [VM Detail](/d/veeam-grafana-collector-vm/veeam-grafana-collector-vm?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-vm=${vm}) &nbsp;&nbsp; [Repositories](/d/veeam-grafana-collector-repositories/veeam-grafana-collector-repositories?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server}&var-repository=${repository}) &nbsp;&nbsp; [Failed Jobs](/d/veeam-grafana-collector-failed-jobs/veeam-grafana-collector-failed-jobs?${__url_time_range}&var-datasource=${datasource}&var-bucket=${bucket}&var-customer=${customer}&var-site=${site}&var-server=${server})"
+      }
+    },
+    {
+      "id": 1,
       "type": "table",
       "title": "Backup Proxies",
       "description": "",
@@ -50,7 +66,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -76,7 +92,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -89,7 +105,7 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_proxy\")\n  |> filter(fn: (r) => r._field == \"enabled\" or r._field == \"max_tasks\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"proxy\", \"_field\"])\n  |> last()\n  |> group(columns:[\"proxy\"])\n  |> pivot(rowKey:[\"proxy\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"proxy\", \"enabled\", \"max_tasks\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_proxy\")\n  |> filter(fn: (r) => r._field == \"enabled\" or r._field == \"max_tasks\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"proxy\", \"_field\"])\n  |> last()\n  |> group(columns:[\"proxy\"])\n  |> pivot(rowKey:[\"proxy\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"proxy\", \"enabled\", \"max_tasks\"])"
         }
       ]
     },
@@ -106,7 +122,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 3
       },
       "fieldConfig": {
         "defaults": {
@@ -132,7 +148,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -145,7 +161,7 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_gateway\")\n  |> filter(fn: (r) => r._field == \"enabled\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"gateway\", \"_field\"])\n  |> last()\n  |> group(columns:[\"gateway\"])\n  |> pivot(rowKey:[\"gateway\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"gateway\", \"enabled\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_gateway\")\n  |> filter(fn: (r) => r._field == \"enabled\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"gateway\", \"_field\"])\n  |> last()\n  |> group(columns:[\"gateway\"])\n  |> pivot(rowKey:[\"gateway\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"gateway\", \"enabled\"])"
         }
       ]
     },
@@ -162,7 +178,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 11
       },
       "fieldConfig": {
         "defaults": {
@@ -188,7 +204,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -201,7 +217,7 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_mount_server\")\n  |> filter(fn: (r) => r._field == \"enabled\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"mount_server\", \"_field\"])\n  |> last()\n  |> group(columns:[\"mount_server\"])\n  |> pivot(rowKey:[\"mount_server\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"mount_server\", \"enabled\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_mount_server\")\n  |> filter(fn: (r) => r._field == \"enabled\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"mount_server\", \"_field\"])\n  |> last()\n  |> group(columns:[\"mount_server\"])\n  |> pivot(rowKey:[\"mount_server\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"mount_server\", \"enabled\"])"
         }
       ]
     },
@@ -218,7 +234,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 11
       },
       "fieldConfig": {
         "defaults": {
@@ -244,7 +260,7 @@
       },
       "options": {
         "showHeader": true,
-        "cellHeight": "sm",
+        "cellHeight": "lg",
         "footer": {
           "show": false,
           "reducer": [
@@ -257,7 +273,7 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_endpoint_status\")\n  |> filter(fn: (r) => r._field == \"available\" or r._field == \"item_count\" or r._field == \"duration_ms\" or r._field == \"error\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.collector =~ /infrastructure/))\n  |> group(columns:[\"collector\", \"endpoint\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"collector\", \"endpoint\", \"status\"])\n  |> pivot(rowKey:[\"collector\", \"endpoint\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns:[\"collector\", \"endpoint\", \"status\", \"available\", \"item_count\", \"duration_ms\", \"error\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_endpoint_status\")\n  |> filter(fn: (r) => r._field == \"available\" or r._field == \"item_count\" or r._field == \"duration_ms\" or r._field == \"error\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.collector =~ /infrastructure/))\n  |> group(columns:[\"collector\", \"endpoint\", \"status\", \"_field\"])\n  |> last()\n  |> group(columns:[\"collector\", \"endpoint\", \"status\"])\n  |> pivot(rowKey:[\"collector\", \"endpoint\", \"status\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"collector\", \"endpoint\", \"status\", \"available\", \"item_count\", \"duration_ms\", \"error\"])"
         }
       ]
     }
@@ -432,6 +448,6 @@
   "timezone": "browser",
   "title": "Veeam Grafana Collector - Infrastructure",
   "uid": "veeam-grafana-collector-infrastructure",
-  "version": 1,
+  "version": 10001,
   "weekStart": ""
 }
