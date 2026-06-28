@@ -63,7 +63,63 @@ function ConvertTo-SafeTagValue {
         return ''
     }
 
-    return ([string]$Value).Replace('\', '\\').Replace(',', '\,').Replace(' ', '\ ').Replace('=', '\=')
+    $text = ConvertTo-FlatString -Value $Value
+    return $text.Replace('\', '\\').Replace(',', '\,').Replace(' ', '\ ').Replace('=', '\=')
+}
+
+function ConvertTo-FlatString {
+    [CmdletBinding()]
+    param(
+        [AllowNull()]
+        [object]$Value
+    )
+
+    if ($null -eq $Value) {
+        return ''
+    }
+
+    if ($Value -is [string]) {
+        return ($Value -replace '[\r\n\t]+', ' ').Trim()
+    }
+
+    if ($Value -is [System.Management.Automation.PSCustomObject]) {
+        foreach ($name in @('result', 'state', 'status', 'name', 'message')) {
+            if ($Value.PSObject.Properties[$name] -and $null -ne $Value.$name) {
+                return ConvertTo-FlatString -Value $Value.$name
+            }
+        }
+    }
+
+    return (([string]$Value) -replace '[\r\n\t]+', ' ').Trim()
+}
+
+function ConvertTo-VeeamResultText {
+    [CmdletBinding()]
+    param(
+        [AllowNull()]
+        [object]$Value,
+
+        [string]$Default = 'Unknown'
+    )
+
+    $result = ConvertTo-FlatString -Value $Value
+    if ([string]::IsNullOrWhiteSpace($result)) {
+        return $Default
+    }
+
+    if ($result -match 'Success') {
+        return 'Success'
+    }
+
+    if ($result -match 'Warning') {
+        return 'Warning'
+    }
+
+    if ($result -match 'Fail|Error') {
+        return 'Failed'
+    }
+
+    return $result
 }
 
 function ConvertTo-InfluxFieldValue {
@@ -89,7 +145,7 @@ function ConvertTo-InfluxFieldValue {
         return ([Convert]::ToString($Value, [Globalization.CultureInfo]::InvariantCulture))
     }
 
-    return '"' + ([string]$Value).Replace('\', '\\').Replace('"', '\"') + '"'
+    return '"' + (ConvertTo-FlatString -Value $Value).Replace('\', '\\').Replace('"', '\"') + '"'
 }
 
 function Invoke-WithRetry {
@@ -195,4 +251,4 @@ function Get-JobCategory {
     }
 }
 
-if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Read-CollectorConfig, Test-CollectorConfig, ConvertTo-SafeTagValue, ConvertTo-InfluxFieldValue, Invoke-WithRetry, Test-RetryableError, Get-PropertyValue, Get-JobCategory }
+if ($ExecutionContext.SessionState.Module) { Export-ModuleMember -Function Read-CollectorConfig, Test-CollectorConfig, ConvertTo-SafeTagValue, ConvertTo-FlatString, ConvertTo-VeeamResultText, ConvertTo-InfluxFieldValue, Invoke-WithRetry, Test-RetryableError, Get-PropertyValue, Get-JobCategory }

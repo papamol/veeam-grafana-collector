@@ -24,12 +24,12 @@ function ConvertTo-TaskSessionMetrics {
                 job_name = $jobName
                 vm = Get-PropertyValue -InputObject $task -Names @('vmName', 'name') -Default 'unknown'
                 job_category = Get-JobCategory -Type $jobType -Name $jobName
-                result = Get-PropertyValue -InputObject $task -Names @('result') -Default 'Unknown'
-                status = Get-PropertyValue -InputObject $task -Names @('state', 'status') -Default 'Unknown'
+                result = ConvertTo-VeeamResultText -Value (Get-PropertyValue -InputObject $task -Names @('result') -Default 'Unknown')
+                status = ConvertTo-FlatString -Value (Get-PropertyValue -InputObject $task -Names @('state', 'status') -Default 'Unknown')
             }
             Fields = @{
                 duration_seconds = [int](Get-PropertyValue -InputObject $task -Names @('durationSeconds', 'duration') -Default 0)
-                failure_message = [string](Get-PropertyValue -InputObject $task -Names @('failureMessage', 'message') -Default '')
+                failure_message = ConvertTo-FlatString -Value (Get-PropertyValue -InputObject $task -Names @('failureMessage', 'message') -Default '')
             }
         }
     }

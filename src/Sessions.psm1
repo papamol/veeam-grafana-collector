@@ -23,8 +23,8 @@ function ConvertTo-SessionMetrics {
                 server = $Config.ServerName
                 job_name = $jobName
                 job_category = Get-JobCategory -Type $jobType -Name $jobName
-                result = Get-PropertyValue -InputObject $session -Names @('result') -Default 'Unknown'
-                status = Get-PropertyValue -InputObject $session -Names @('state', 'status') -Default 'Unknown'
+                result = ConvertTo-VeeamResultText -Value (Get-PropertyValue -InputObject $session -Names @('result') -Default 'Unknown')
+                status = ConvertTo-FlatString -Value (Get-PropertyValue -InputObject $session -Names @('state', 'status') -Default 'Unknown')
             }
             Fields = @{
                 duration_seconds = [int](Get-PropertyValue -InputObject $session -Names @('durationSeconds', 'duration') -Default 0)

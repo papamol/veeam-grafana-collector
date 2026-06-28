@@ -58,8 +58,8 @@ function ConvertTo-ProtectionMetrics {
                 $taskJobType = Get-PropertyValue -InputObject $_ -Names @('jobType', 'type') -Default ''
                 $taskJobName = Get-PropertyValue -InputObject $_ -Names @('jobName', 'name') -Default ''
                 $taskCategory = Get-JobCategory -Type $taskJobType -Name $taskJobName
-                $taskResult = Get-PropertyValue -InputObject $_ -Names @('result') -Default 'Unknown'
-                $taskStatus = Get-PropertyValue -InputObject $_ -Names @('state', 'status') -Default 'Unknown'
+                $taskResult = ConvertTo-VeeamResultText -Value (Get-PropertyValue -InputObject $_ -Names @('result') -Default 'Unknown')
+                $taskStatus = ConvertTo-FlatString -Value (Get-PropertyValue -InputObject $_ -Names @('state', 'status') -Default 'Unknown')
 
                 ($taskCategory -eq 'Backup' -or $taskCategory -eq 'Backup Copy' -or $taskCategory -eq 'Agent' -or $taskCategory -eq 'NAS') -and
                 $taskResult -notmatch 'Failed|Error' -and

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.2.6] - 2026-06-28
+
+### Fixed
+
+- Normalized structured Veeam session and task-session result objects before writing them as InfluxDB tags.
+- Flattened multiline Veeam error messages before writing line protocol to prevent InfluxDB `400 Bad Request` parse failures.
+
 ## [0.2.5] - 2026-06-27
 
 ### Fixed
