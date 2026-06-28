@@ -409,7 +409,9 @@
               "stale_backup": "Stale Backup",
               "stale_replication": "Stale Replication",
               "restore_point_count": "Restore Points",
-              "latest_restore_point_age_hours": "Latest Restore Age Hours"
+              "latest_restore_point_age_hours": "Latest Restore Age Hours",
+              "backup_task_count": "Backup Task Evidence",
+              "latest_backup_evidence_age_hours": "Latest Backup Evidence Age Hours"
             },
             "indexByName": {
               "vm": 0,
@@ -419,7 +421,9 @@
               "stale_backup": 4,
               "stale_replication": 5,
               "restore_point_count": 6,
-              "latest_restore_point_age_hours": 7
+              "latest_restore_point_age_hours": 7,
+              "backup_task_count": 7,
+              "latest_backup_evidence_age_hours": 8
             }
           }
         }
@@ -427,7 +431,7 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\" or r._field == \"stale_backup\" or r._field == \"stale_replication\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"no_backup\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\"])\n  |> filter(fn: (r) => exists r.no_backup and r.no_backup == 1)\n  |> sort(columns:[\"vm\"])"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"no_backup\" or r._field == \"stale_backup\" or r._field == \"stale_replication\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\" or r._field == \"latest_backup_evidence_age_hours\" or r._field == \"backup_task_count\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/)\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"no_backup\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\", \"latest_backup_evidence_age_hours\", \"backup_task_count\"])\n  |> filter(fn: (r) => exists r.no_backup and r.no_backup == 1)\n  |> sort(columns:[\"vm\"])"
         }
       ]
     },
@@ -583,7 +587,9 @@
               "stale_backup": "Stale Backup",
               "stale_replication": "Stale Replication",
               "restore_point_count": "Restore Points",
-              "latest_restore_point_age_hours": "Latest Restore Age Hours"
+              "latest_restore_point_age_hours": "Latest Restore Age Hours",
+              "backup_task_count": "Backup Task Evidence",
+              "latest_backup_evidence_age_hours": "Latest Backup Evidence Age Hours"
             },
             "indexByName": {
               "vm": 0,
@@ -593,7 +599,9 @@
               "stale_backup": 4,
               "stale_replication": 5,
               "restore_point_count": 6,
-              "latest_restore_point_age_hours": 7
+              "latest_restore_point_age_hours": 7,
+              "backup_task_count": 7,
+              "latest_backup_evidence_age_hours": 8
             }
           }
         }
@@ -601,7 +609,7 @@
       "targets": [
         {
           "refId": "A",
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\" or r._field == \"no_backup\" or r._field == \"backup\" or r._field == \"backup_copy\" or r._field == \"replication\" or r._field == \"stale_backup\" or r._field == \"stale_replication\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.vm =~ /^${vm:regex}$/))\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"protected\", \"no_backup\", \"backup\", \"backup_copy\", \"replication\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\"])\n  |> sort(columns:[\"no_backup\", \"stale_backup\", \"vm\"], desc:true)"
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"veeam_vm_protection\")\n  |> filter(fn: (r) => r._field == \"protected\" or r._field == \"no_backup\" or r._field == \"backup\" or r._field == \"backup_copy\" or r._field == \"replication\" or r._field == \"stale_backup\" or r._field == \"stale_replication\" or r._field == \"restore_point_count\" or r._field == \"latest_restore_point_age_hours\" or r._field == \"latest_backup_evidence_age_hours\" or r._field == \"backup_task_count\")\n  |> filter(fn: (r) => r.customer =~ /^${customer:regex}$/ and r.site =~ /^${site:regex}$/ and r.server =~ /^${server:regex}$/ and (r.vm =~ /^${vm:regex}$/))\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\", \"_field\"])\n  |> last()\n  |> group(columns:[\"vm\", \"protection_status\", \"protection_type\"])\n  |> pivot(rowKey:[\"vm\", \"protection_status\", \"protection_type\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> group()\n  |> keep(columns:[\"vm\", \"protection_status\", \"protection_type\", \"protected\", \"no_backup\", \"backup\", \"backup_copy\", \"replication\", \"stale_backup\", \"stale_replication\", \"restore_point_count\", \"latest_restore_point_age_hours\", \"latest_backup_evidence_age_hours\", \"backup_task_count\"])\n  |> sort(columns:[\"no_backup\", \"stale_backup\", \"vm\"], desc:true)"
         }
       ]
     }

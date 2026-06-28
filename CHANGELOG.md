@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 This project follows Semantic Versioning.
 
+## [0.2.5] - 2026-06-27
+
+### Fixed
+
+- Improved VM protection accuracy by treating successful backup task sessions as backup evidence when restore point inventory is incomplete.
+- Added endpoint-specific page sizes for VM inventory, restore points, sessions, and task sessions so protection data is collected beyond the first tiny sample.
+- Updated upgrades to patch existing installed configs with the protection collection settings.
+
+### Added
+
+- Added `backup_task_count` and `latest_backup_evidence_age_hours` fields to VM protection metrics and dashboard tables.
+
 ## [0.2.4] - 2026-06-27
 
 ### Added

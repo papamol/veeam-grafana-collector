@@ -60,9 +60,23 @@ $config = [ordered]@{
         PageSize = 1
         MaxPages = 1
         RequestTimeoutSeconds = 30
+        EndpointPageSize = [ordered]@{
+            '/v1/inventory/vms' = 100
+            '/v1/inventory/virtualMachines' = 100
+            '/v1/inventory/vSphere/virtualMachines' = 100
+            '/v1/inventory/hyperV/virtualMachines' = 100
+            '/v1/restorePoints' = 100
+            '/v1/sessions' = 100
+            '/v1/taskSessions' = 100
+        }
         EndpointMaxPages = [ordered]@{
-            '/v1/sessions' = 10
-            '/v1/taskSessions' = 10
+            '/v1/inventory/vms' = 50
+            '/v1/inventory/virtualMachines' = 50
+            '/v1/inventory/vSphere/virtualMachines' = 50
+            '/v1/inventory/hyperV/virtualMachines' = 50
+            '/v1/restorePoints' = 50
+            '/v1/sessions' = 50
+            '/v1/taskSessions' = 50
         }
     }
     Influx = [ordered]@{

@@ -54,8 +54,31 @@ function ConvertTo-ProtectionMetrics {
         $latestTask = $tasks | ForEach-Object { Get-PropertyValue -InputObject $_ -Names @('endTime', 'stopTime', 'creationTime', 'time') } | Where-Object { $_ } | Sort-Object -Descending | Select-Object -First 1
         $ageHours = if ($latest) { [int]((Get-Date).ToUniversalTime() - ([datetime]$latest).ToUniversalTime()).TotalHours } else { -1 }
         $replicationAgeHours = if ($latestTask) { [int]((Get-Date).ToUniversalTime() - ([datetime]$latestTask).ToUniversalTime()).TotalHours } else { -1 }
-        $hasBackup = $points.Count -gt 0
+        $backupTasks = @($tasks | Where-Object {
+                $taskJobType = Get-PropertyValue -InputObject $_ -Names @('jobType', 'type') -Default ''
+                $taskJobName = Get-PropertyValue -InputObject $_ -Names @('jobName', 'name') -Default ''
+                $taskCategory = Get-JobCategory -Type $taskJobType -Name $taskJobName
+                $taskResult = Get-PropertyValue -InputObject $_ -Names @('result') -Default 'Unknown'
+                $taskStatus = Get-PropertyValue -InputObject $_ -Names @('state', 'status') -Default 'Unknown'
+
+                ($taskCategory -eq 'Backup' -or $taskCategory -eq 'Backup Copy' -or $taskCategory -eq 'Agent' -or $taskCategory -eq 'NAS') -and
+                $taskResult -notmatch 'Failed|Error' -and
+                $taskStatus -notmatch 'Failed|Error'
+            })
+        $latestBackupTask = $backupTasks | ForEach-Object { Get-PropertyValue -InputObject $_ -Names @('endTime', 'stopTime', 'creationTime', 'time') } | Where-Object { $_ } | Sort-Object -Descending | Select-Object -First 1
+        $backupTaskAgeHours = if ($latestBackupTask) { [int]((Get-Date).ToUniversalTime() - ([datetime]$latestBackupTask).ToUniversalTime()).TotalHours } else { -1 }
+        $effectiveAgeHours = if ($ageHours -ge 0 -and $backupTaskAgeHours -ge 0) {
+            [Math]::Min($ageHours, $backupTaskAgeHours)
+        }
+        elseif ($ageHours -ge 0) {
+            $ageHours
+        }
+        else {
+            $backupTaskAgeHours
+        }
+        $hasBackup = $points.Count -gt 0 -or $backupTasks.Count -gt 0
         $hasBackupCopy = @($points | Where-Object { (Get-PropertyValue -InputObject $_ -Names @('backupCopyStatus', 'type', 'jobType') -Default '') -match 'copy' }).Count -gt 0
+        $hasBackupCopy = $hasBackupCopy -or @($backupTasks | Where-Object { (Get-JobCategory -Type (Get-PropertyValue -InputObject $_ -Names @('jobType', 'type') -Default '') -Name (Get-PropertyValue -InputObject $_ -Names @('jobName', 'name') -Default '')) -eq 'Backup Copy' }).Count -gt 0
         $hasReplication = $replicationVmNames.Contains($vmName) -or @($tasks | Where-Object { (Get-PropertyValue -InputObject $_ -Names @('jobType', 'type', 'jobName') -Default '') -match 'Replica|Replication' }).Count -gt 0
         $protectionType = if ($hasBackup -and $hasReplication) {
             'Both Backup and Replication'
@@ -90,8 +113,10 @@ function ConvertTo-ProtectionMetrics {
                 replication = [int]$hasReplication
                 no_backup = [int](-not $hasBackup)
                 restore_point_count = [int]$points.Count
+                backup_task_count = [int]$backupTasks.Count
                 latest_restore_point_age_hours = [int]$ageHours
-                stale_backup = [int]($ageHours -lt 0 -or $ageHours -gt $StaleBackupHours)
+                latest_backup_evidence_age_hours = [int]$effectiveAgeHours
+                stale_backup = [int]($effectiveAgeHours -lt 0 -or $effectiveAgeHours -gt $StaleBackupHours)
                 stale_replication = [int]($hasReplication -and ($replicationAgeHours -lt 0 -or $replicationAgeHours -gt $StaleReplicationHours))
             }
         }

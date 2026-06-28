@@ -52,6 +52,21 @@ function ConvertTo-StringIntHashtable {
     return $result
 }
 
+function Get-HashtableValueOrDefault {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][hashtable]$Hashtable,
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][int]$DefaultValue
+    )
+
+    if ($Hashtable.ContainsKey($Name)) {
+        return [int]$Hashtable[$Name]
+    }
+
+    return $DefaultValue
+}
+
 function Get-CollectionConfig {
     [CmdletBinding()]
     param([Parameter(Mandatory)][psobject]$Config)
@@ -61,6 +76,7 @@ function Get-CollectionConfig {
         PageSize = Get-OptionalIntConfigValue -InputObject $collection -Name 'PageSize' -DefaultValue 1
         MaxPages = Get-OptionalIntConfigValue -InputObject $collection -Name 'MaxPages' -DefaultValue 1
         RequestTimeoutSeconds = Get-OptionalIntConfigValue -InputObject $collection -Name 'RequestTimeoutSeconds' -DefaultValue 30
+        EndpointPageSize = ConvertTo-StringIntHashtable -InputObject $(if ($null -ne $collection -and $collection.PSObject.Properties['EndpointPageSize']) { $collection.EndpointPageSize } else { $null })
         EndpointMaxPages = ConvertTo-StringIntHashtable -InputObject $(if ($null -ne $collection -and $collection.PSObject.Properties['EndpointMaxPages']) { $collection.EndpointMaxPages } else { $null })
     }
 }
@@ -185,6 +201,9 @@ function Get-VeeamCollection {
     $collection = if ($Session.PSObject.Properties['Collection']) { $Session.Collection } else { $null }
     if ($Limit -lt 1) {
         $Limit = if ($null -ne $collection -and $collection.PSObject.Properties['PageSize']) { [int]$collection.PageSize } else { 1 }
+    }
+    if ($null -ne $collection -and $collection.PSObject.Properties['EndpointPageSize']) {
+        $Limit = Get-HashtableValueOrDefault -Hashtable $collection.EndpointPageSize -Name $Path -DefaultValue $Limit
     }
     if ($MaxPages -lt 1) {
         $MaxPages = if ($null -ne $collection -and $collection.PSObject.Properties['MaxPages']) { [int]$collection.MaxPages } else { 1 }

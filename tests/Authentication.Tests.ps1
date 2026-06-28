@@ -120,6 +120,47 @@ Describe 'Get-VeeamCollection' {
         $requestedUris[2] | Should -Be 'https://localhost:9419/api/v1/sessions?limit=2&skip=4'
     }
 
+    It 'honors endpoint page size overrides for protection-critical endpoints' {
+        $requestedUris = [System.Collections.Generic.List[string]]::new()
+        Mock Invoke-RestMethod {
+            $requestedUris.Add($Uri)
+            [pscustomobject]@{
+                data = @([pscustomobject]@{ id = 'rp-1' })
+                pagination = [pscustomobject]@{
+                    total = 1
+                    count = 1
+                    skip = 0
+                    limit = 1
+                }
+            }
+        } -ModuleName Authentication
+
+        $session = [pscustomobject]@{
+            BaseUrl = 'https://localhost:9419/api'
+            Headers = @{
+                Authorization = 'Bearer token'
+                Accept = 'application/json'
+                'x-api-version' = '1.3-rev1'
+            }
+            SkipCertificateCheck = $true
+            TimeoutSec = 30
+            Collection = [pscustomobject]@{
+                PageSize = 1
+                MaxPages = 1
+                RequestTimeoutSeconds = 30
+                EndpointPageSize = @{
+                    '/v1/restorePoints' = 100
+                }
+                EndpointMaxPages = @{}
+            }
+        }
+
+        $result = Get-VeeamCollection -Session $session -Path '/v1/restorePoints'
+
+        $result.Count | Should -Be 1
+        $requestedUris[0] | Should -Be 'https://localhost:9419/api/v1/restorePoints?limit=100&skip=0'
+    }
+
     It 'uses the first collection endpoint candidate that succeeds' {
         $requestedUris = [System.Collections.Generic.List[string]]::new()
         Mock Invoke-RestMethod {

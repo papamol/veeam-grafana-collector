@@ -68,9 +68,23 @@ The installer creates `config.json`.
     "PageSize": 1,
     "MaxPages": 1,
     "RequestTimeoutSeconds": 30,
+    "EndpointPageSize": {
+      "/v1/inventory/vms": 100,
+      "/v1/inventory/virtualMachines": 100,
+      "/v1/inventory/vSphere/virtualMachines": 100,
+      "/v1/inventory/hyperV/virtualMachines": 100,
+      "/v1/restorePoints": 100,
+      "/v1/sessions": 100,
+      "/v1/taskSessions": 100
+    },
     "EndpointMaxPages": {
-      "/v1/sessions": 10,
-      "/v1/taskSessions": 10
+      "/v1/inventory/vms": 50,
+      "/v1/inventory/virtualMachines": 50,
+      "/v1/inventory/vSphere/virtualMachines": 50,
+      "/v1/inventory/hyperV/virtualMachines": 50,
+      "/v1/restorePoints": 50,
+      "/v1/sessions": 50,
+      "/v1/taskSessions": 50
     }
   },
   "Influx": {
@@ -82,7 +96,7 @@ The installer creates `config.json`.
 }
 ```
 
-`Collection` is optional. Defaults are conservative because some Veeam REST endpoints can be slow or hang when deeply paged. Increase `PageSize`, `MaxPages`, or `EndpointMaxPages` after validating endpoint behavior in your environment.
+`Collection` is optional. Global defaults are conservative because some Veeam REST endpoints can be slow or hang when deeply paged. Protection-critical endpoints can use `EndpointPageSize` and `EndpointMaxPages` so VM inventory, restore points, sessions, and task sessions are collected more completely without making every endpoint aggressive.
 
 ## Run Manually
 

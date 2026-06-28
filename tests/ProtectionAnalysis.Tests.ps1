@@ -37,4 +37,33 @@ Describe 'ConvertTo-ProtectionMetrics' {
         $byVm['vm-none'].Tags.protection_type | Should -Be 'Unprotected'
         $byVm['vm-none'].Fields.no_backup | Should -Be 1
     }
+
+    It 'uses successful backup task sessions as backup evidence when restore points are incomplete' {
+        $config = [pscustomobject]@{
+            Customer = 'CustomerA'
+            Site = 'SiteA'
+            ServerName = 'VBR01'
+        }
+        $vms = @(
+            [pscustomobject]@{ name = 'vm-task-protected' }
+        )
+        $tasks = @(
+            [pscustomobject]@{
+                vmName = 'vm-task-protected'
+                jobType = 'Backup'
+                jobName = 'Daily Backup'
+                result = 'Success'
+                status = 'Stopped'
+                endTime = (Get-Date).ToUniversalTime().AddHours(-2).ToString('o')
+            }
+        )
+
+        $metrics = @(ConvertTo-ProtectionMetrics -VMs $vms -RestorePoints @() -TaskSessions $tasks -ReplicationJobs @() -Config $config)
+
+        $metrics[0].Tags.protection_status | Should -Be 'Protected'
+        $metrics[0].Tags.protection_type | Should -Be 'Backup'
+        $metrics[0].Fields.protected | Should -Be 1
+        $metrics[0].Fields.no_backup | Should -Be 0
+        $metrics[0].Fields.backup_task_count | Should -Be 1
+    }
 }
